@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#1a237e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Inventario 2026">
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkludmVudGFyaW8gMjAyNiIsCiAgInNob3J0X25hbWUiOiAiSW52ZW50YXJpbyIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMWExMjM3ZSIsCiAgInRoZW1lX2NvbG9yIjogIiMxYTIzN2UiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUIyWld4bFkzUWdjR0Z5Wlc1a1BTSmtaV3hyYjI1c2FXNGlJSFpsYkdsemRDMWpjbUZrUFNKbGJtRmliM1ZmTWpBeU5pSWdkMmxrZEdnOUlqRTVNQ0lnYUdWcFoyaDBQU0l4T1RBaUlIeHdZWE56WlhJZ1ptbHNiRDBpSXpvdkwzZDNkeTVoY0dWbGJpOGlQanh3WVhSb0lHWnBiR3c5SWlNNU9UazVPVGtpSUhKaGJtZGhjR2x1WnowaVUxWkdkR1Z6V2xWamRXVnVkQ0lnWm1sc2JDMWtaVzFqWlRwemFHRXlQV1poYkhObExuQmtaaTl6YUdFeU9pSXZQand2YzJaeUx6NEsiCiAgICB9CiAgXQp9">
+    <title>Inventario 2026</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        :root {
+            --primary: #1a237e; --primary-light: #283593; --accent: #ff6f00; --success: #2e7d32;
+            --warning: #f57c00; --danger: #c62828; --info: #1565c0; --bg: #f5f5f5; --card: #ffffff;
+            --border: #e0e0e0; --text: #212121; --text-secondary: #616161; --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --radius: 12px; --bottom-nav-height: 65px;
+        }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; -webkit-tap-highlight-color: transparent; user-select: none; }
+        .header { background: linear-gradient(135deg, var(--primary) 0%, #0d1b5e 100%); color: white; padding: 0.75rem 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.2); position: sticky; top: 0; z-index: 100; }
+        .header-content { max-width: 1400px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }
+        .header h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: 0.3px; } .header h1 span { color: #ffab40; }
+        .header-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
+        .btn { padding: 0.5rem 0.9rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.75rem; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.3rem; white-space: nowrap; background: transparent; color: inherit; touch-action: manipulation; user-select: none; }
+        .btn-primary { background: var(--accent); color: white; } .btn-primary:active { background: #e65100; transform: scale(0.96); }
+        .btn-secondary { background: white; color: var(--primary); border: 2px solid var(--primary); } .btn-secondary:active { background: #e8eaf6; }
+        .btn-success { background: var(--success); color: white; } .btn-info { background: var(--info); color: white; }
+        .btn-warning { background: var(--warning); color: white; } .btn-danger { background: var(--danger); color: white; }
+        .btn-outline { background: transparent; color: white; border: 2px solid rgba(255,255,255,0.5); } .btn-outline:active { background: rgba(255,255,255,0.1); }
+        .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.7rem; }
+        .main-container { max-width: 1400px; margin: 0 auto; padding: 0.75rem; padding-bottom: calc(var(--bottom-nav-height) + 1rem); }
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.6rem; margin-bottom: 0.75rem; }
+        .stat-card { background: var(--card); border-radius: var(--radius); padding: 0.8rem; box-shadow: var(--shadow); border-left: 4px solid transparent; cursor: pointer; transition: transform 0.2s; }
+        .stat-card:active { transform: scale(0.97); } .stat-card.total { border-left-color: var(--primary); } .stat-card.pendientes { border-left-color: var(--danger); } .stat-card.inventariados { border-left-color: var(--success); } .stat-card.cambios { border-left-color: var(--warning); } .stat-card.progreso { border-left-color: var(--info); }
+        .stat-value { font-size: 1.4rem; font-weight: 700; } .stat-label { font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; }
+        .progress-container { background: var(--card); border-radius: var(--radius); padding: 0.8rem; margin-bottom: 0.75rem; box-shadow: var(--shadow); }
+        .progress-bar-wrapper { background: #e0e0e0; border-radius: 20px; height: 18px; overflow: hidden; margin: 0.4rem 0; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #2e7d32, #4caf50); border-radius: 20px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 0.65rem; transition: width 0.5s ease; }
+        .search-section { background: var(--card); border-radius: var(--radius); padding: 0.8rem; margin-bottom: 0.75rem; box-shadow: var(--shadow); }
+        .search-row { display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap; }
+        .search-input-group { display: flex; flex: 1; min-width: 180px; }
+        .search-input { flex: 1; padding: 0.6rem; border: 2px solid var(--border); border-radius: 8px 0 0 8px; font-size: 0.85rem; }
+        .search-btn { padding: 0.6rem 0.9rem; background: var(--primary); color: white; border: none; border-radius: 0 8px 8px 0; font-weight: 600; cursor: pointer; }
+        .clear-search-btn { background: none; border: 2px solid var(--border); border-radius: 8px; padding: 0.55rem; color: var(--danger); font-size: 1.1rem; cursor: pointer; display: none; }
+        .scan-btn { background: #6a1b9a; color: white; border: none; border-radius: 8px; padding: 0.6rem 0.8rem; font-weight: 600; cursor: pointer; }
+        .scan-btn.active-scan { background: #c62828; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(198,40,40,0.4); } 50% { box-shadow: 0 0 0 12px rgba(198,40,40,0); } }
+        .quick-filters { display: flex; gap: 0.3rem; margin-top: 0.6rem; flex-wrap: wrap; align-items: center; }
+        .filter-chip { padding: 0.25rem 0.7rem; border-radius: 20px; font-size: 0.65rem; cursor: pointer; border: 1.5px solid var(--border); background: white; font-weight: 500; transition: 0.2s; }
+        .filter-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .asset-detail { background: var(--card); border-radius: var(--radius); padding: 0.8rem; box-shadow: var(--shadow); margin-bottom: 0.75rem; display: none; }
+        .asset-detail.active { display: block; }
+        .asset-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.6rem; padding-bottom: 0.6rem; border-bottom: 2px solid var(--border); }
+        .asset-code { font-size: 1.2rem; font-weight: 700; color: var(--primary); }
+        .asset-status-badge { padding: 0.2rem 0.6rem; border-radius: 20px; font-weight: 600; font-size: 0.65rem; }
+        .badge-pendiente { background: #fce4ec; color: #c62828; } .badge-sin-cambio { background: #e3f2fd; color: #1565c0; } .badge-cambio { background: #fff3e0; color: #e65100; } .badge-nuevo { background: #e8f5e9; color: #2e7d32; }
+        .asset-info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.5rem; margin-bottom: 0.8rem; }
+        .info-item { background: #fafafa; padding: 0.5rem; border-radius: 8px; border-left: 3px solid var(--primary); }
+        .info-label { font-size: 0.6rem; text-transform: uppercase; color: var(--text-secondary); font-weight: 600; }
+        .info-value { font-weight: 500; font-size: 0.8rem; }
+        .update-section { background: #fff8e1; border-radius: var(--radius); padding: 0.8rem; border: 2px solid #ffcc02; margin-top: 0.5rem; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.6rem; }
+        .form-group label { font-weight: 600; font-size: 0.7rem; margin-bottom: 0.15rem; display: block; }
+        .form-group select, .form-group input, .form-group textarea { padding: 0.5rem; border: 2px solid var(--border); border-radius: 8px; font-size: 0.8rem; width: 100%; }
+        .form-actions { display: flex; gap: 0.4rem; margin-top: 0.8rem; flex-wrap: wrap; }
+        .form-actions .btn { pointer-events: auto; }
+        .history-section { background: var(--card); border-radius: var(--radius); padding: 0.8rem; box-shadow: var(--shadow); }
+        .table-wrapper { overflow-x: auto; max-height: 350px; overflow-y: auto; border-radius: 8px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.65rem; }
+        thead th { background: var(--primary); color: white; padding: 0.45rem; position: sticky; top: 0; font-size: 0.65rem; }
+        tbody td { padding: 0.35rem; border-bottom: 1px solid var(--border); }
+        .empty-state { text-align: center; padding: 2rem; color: var(--text-secondary); font-size: 0.8rem; }
+        .action-btn { background: none; border: none; cursor: pointer; font-size: 1rem; padding: 0 0.25rem; }
+        .bottom-nav { display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: var(--bottom-nav-height); background: var(--primary); box-shadow: 0 -2px 10px rgba(0,0,0,0.2); z-index: 110; justify-content: space-around; align-items: center; padding: 0 0.3rem; }
+        .bottom-nav .nav-item { display: flex; flex-direction: column; align-items: center; color: rgba(255,255,255,0.7); font-size: 0.6rem; cursor: pointer; transition: 0.2s; padding: 0.2rem; border-radius: 8px; min-width: 50px; gap: 0.1rem; }
+        .bottom-nav .nav-item i { font-size: 1.1rem; } .bottom-nav .nav-item.active { color: #ffab40; background: rgba(255,255,255,0.15); }
+        .menu-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; justify-content: center; align-items: flex-start; padding-top: 4rem; }
+        .menu-overlay.active { display: flex; }
+        .menu-panel { background: var(--card); border-radius: var(--radius); padding: 1rem; min-width: 200px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+        .menu-panel .menu-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.8rem; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 500; color: var(--text); transition: background 0.2s; }
+        .menu-panel .menu-item:active { background: #f0f0f0; }
+        .camera-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 300; flex-direction: column; align-items: center; justify-content: center; }
+        .camera-overlay.active { display: flex; }
+        #reader { width: 100%; height: 100%; }
+        .close-camera-btn { position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.5rem; cursor: pointer; z-index: 301; display: flex; align-items: center; justify-content: center; }
+        .new-asset-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 250; justify-content: center; align-items: center; padding: 1rem; }
+        .new-asset-overlay.active { display: flex; }
+        .new-asset-panel { background: var(--card); border-radius: var(--radius); padding: 1.5rem; max-width: 500px; width: 100%; box-shadow: 0 12px 32px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; }
+        .toast { position: fixed; bottom: 5rem; right: 0.5rem; background: #333; color: white; padding: 0.7rem 1rem; border-radius: 8px; font-weight: 500; z-index: 400; font-size: 0.75rem; animation: slideIn 0.3s; }
+        .toast.success { background: #2e7d32; } .toast.error { background: #c62828; } .toast.info { background: #1565c0; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } }
+        .hidden-input { display: none; }
+        @media (max-width: 768px) {
+            .header-content { flex-direction: column; align-items: stretch; } .header h1 { text-align: center; }
+            .header-actions { justify-content: center; gap: 0.3rem; flex-wrap: wrap; }
+            .header-actions .btn { padding: 0.35rem 0.5rem; font-size: 0.65rem; gap: 0.2rem; }
+            .dashboard { grid-template-columns: repeat(2, 1fr); } .bottom-nav { display: flex; }
+            .main-container { padding-bottom: calc(var(--bottom-nav-height) + 1rem); }
+            .search-row { flex-direction: column; align-items: stretch; } .search-input-group { width: 100%; }
+            .asset-info-grid { grid-template-columns: 1fr; } .form-grid { grid-template-columns: 1fr; }
+            .header-actions .btn-outline { display: inline-flex; }
+        }
+    </style>
+</head>
+<body>
+    <div class="install-banner" id="installBanner" onclick="instalarApp()" style="display:none;background:var(--primary);color:white;padding:0.5rem;text-align:center;cursor:pointer;">
+        📲 Instalar app para acceso rápido <span style="text-decoration:underline;">Toca aquí</span>
+    </div>
+
+    <header class="header">
+        <div class="header-content">
+            <h1>📋 Inventario <span>2026</span></h1>
+            <div class="header-actions">
+                <button class="btn btn-outline btn-sm" id="menuToggleBtn" onclick="toggleMenu()">☰ Menú</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Menú flotante -->
+    <div class="menu-overlay" id="menuOverlay" onclick="closeMenu(event)">
+        <div class="menu-panel" onclick="event.stopPropagation()">
+            <div class="menu-item" onclick="document.getElementById('fileInputXlsx').click(); closeMenuDirect();">📂 Importar</div>
+            <div class="menu-item" onclick="guardarProgresoXLSX(); closeMenuDirect();">💾 Guardar Progreso</div>
+            <div class="menu-item" onclick="document.getElementById('loadProgressInputXlsx').click(); closeMenuDirect();">📥 Cargar Progreso</div>
+            <div class="menu-item" onclick="exportarExcel(); closeMenuDirect();">📊 Exportar</div>
+        </div>
+    </div>
+
+    <!-- Cámara a pantalla completa -->
+    <div class="camera-overlay" id="cameraOverlay">
+        <button class="close-camera-btn" onclick="detenerScanner()">✕</button>
+        <div id="reader"></div>
+    </div>
+
+    <!-- Formulario Nuevo Activo -->
+    <div class="new-asset-overlay" id="newAssetOverlay" onclick="if(event.target===this) closeNewAssetForm()">
+        <div class="new-asset-panel" onclick="event.stopPropagation()">
+            <h3 style="margin-bottom:1rem;">➕ Agregar Nuevo Activo</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Código (opcional)</label>
+                    <input type="text" id="newCodigo" placeholder="Dejar vacío para autoasignar">
+                </div>
+                <div class="form-group">
+                    <label>Nuevo Piso *</label>
+                    <select id="newNuevoPiso" onchange="actualizarSubUbicaciones_New()">
+                        <option value="">Seleccionar...</option>
+                        <option value="PB">Planta Baja</option><option value="P1">Piso 1</option><option value="P2">Piso 2</option>
+                        <option value="P3">Piso 3</option><option value="Terraza">Terraza</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Ubicación Específica *</label>
+                    <select id="newNuevaSubUbicacion" disabled><option>Primero elija piso</option></select>
+                </div>
+                <div class="form-group">
+                    <label>Nuevo Responsable</label>
+                    <input type="text" id="newNuevoResponsable" list="listaResponsables" placeholder="Nombre o seleccione..." autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>Nuevo Estado</label>
+                    <select id="newNuevoEstado">
+                        <option value="">Sin cambios</option><option>Buen Estado</option><option>Mal Estado</option>
+                        <option>Obsoleto</option><option>En Movimiento</option><option>Revalúo</option>
+                    </select>
+                </div>
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label>Observaciones</label>
+                    <textarea id="newObservaciones" rows="2" placeholder="Notas..."></textarea>
+                </div>
+            </div>
+            <div class="form-actions" style="margin-top:1rem;">
+                <button class="btn btn-success btn-sm" onclick="guardarNuevoActivo()">💾 Guardar Activo</button>
+                <button class="btn btn-danger btn-sm" onclick="closeNewAssetForm()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <main class="main-container">
+        <div class="dashboard">
+            <div class="stat-card total"><span class="stat-value" id="totalActivos">0</span><span class="stat-label">Total</span></div>
+            <div class="stat-card pendientes"><span class="stat-value" id="pendientes">0</span><span class="stat-label">Pendientes</span></div>
+            <div class="stat-card inventariados"><span class="stat-value" id="inventariados">0</span><span class="stat-label">Inventariados</span></div>
+            <div class="stat-card cambios"><span class="stat-value" id="conCambios">0</span><span class="stat-label">Con cambios</span></div>
+            <div class="stat-card progreso"><span class="stat-value" id="porcentajeProgreso">0%</span><span class="stat-label">Progreso</span></div>
+        </div>
+
+        <div class="progress-container">
+            <strong>Progreso general</strong>
+            <div class="progress-bar-wrapper"><div class="progress-bar-fill" id="progressBar" style="width:0%">0%</div></div>
+            <small id="progressText">0 de 0 activos inventariados</small>
+        </div>
+
+        <div class="search-section">
+            <div class="search-row">
+                <div class="search-input-group">
+                    <input type="text" class="search-input" id="searchInput" placeholder="🔍 Código de activo..." onkeyup="if(event.key==='Enter') buscarActivo()">
+                    <button class="search-btn" onclick="buscarActivo()">Buscar</button>
+                </div>
+                <button class="clear-search-btn" id="clearSearchBtn" onclick="limpiarBusqueda()">✖️</button>
+                <button class="scan-btn" id="scanBtn" onclick="toggleScanner()">📷</button>
+                <button class="btn btn-warning btn-sm" onclick="buscarPrimerPendiente()">⏩ Pendiente</button>
+                <button class="btn btn-success btn-sm" onclick="openNewAssetForm()">➕ Nuevo</button>
+            </div>
+            <div class="quick-filters">
+                <span style="font-weight:600; margin-right:0.3rem;">Filtros:</span>
+                <span class="filter-chip" data-filter="todos" onclick="toggleStateFilter('todos', this)">Todos</span>
+                <span class="filter-chip" data-filter="pendiente" onclick="toggleStateFilter('pendiente', this)">⏳ Pendientes</span>
+                <span class="filter-chip" data-filter="sin_cambio" onclick="toggleStateFilter('sin_cambio', this)">✅ Sin cambios</span>
+                <span class="filter-chip" data-filter="con_cambio" onclick="toggleStateFilter('con_cambio', this)">🔄 Con cambios</span>
+                <span class="filter-chip" data-filter="nuevo" onclick="toggleStateFilter('nuevo', this)">🆕 Nuevos</span>
+                <span class="filter-chip" data-filter="PB" onclick="togglePisoFilter('PB', this)">🏢 PB</span>
+                <span class="filter-chip" data-filter="P1" onclick="togglePisoFilter('P1', this)">🏢 P1</span>
+                <span class="filter-chip" data-filter="P2" onclick="togglePisoFilter('P2', this)">🏢 P2</span>
+                <span class="filter-chip" data-filter="P3" onclick="togglePisoFilter('P3', this)">🏢 P3</span>
+                <span class="filter-chip" data-filter="Terraza" onclick="togglePisoFilter('Terraza', this)">🌅 Terraza</span>
+            </div>
+        </div>
+
+        <div class="asset-detail" id="assetDetail">
+            <!-- igual que antes -->
+            <div class="asset-header">
+                <div>
+                    <div class="asset-code" id="assetCode">-</div>
+                    <span class="asset-status-badge badge-pendiente" id="assetStatusBadge">PENDIENTE</span>
+                </div>
+                <div style="display:flex; gap:0.3rem; align-items:center;">
+                    <button class="btn btn-sm btn-secondary" onclick="navegarActivo(-1)">◀</button>
+                    <span id="navInfo" style="font-size:0.7rem;"></span>
+                    <button class="btn btn-sm btn-secondary" onclick="navegarActivo(1)">▶</button>
+                </div>
+            </div>
+            <div class="asset-info-grid">
+                <div class="info-item"><span class="info-label">Familia/Nombre</span><div class="info-value" id="assetNombre">-</div></div>
+                <div class="info-item"><span class="info-label">Descripción</span><div class="info-value" id="assetDescripcion">-</div></div>
+                <div class="info-item"><span class="info-label">Ubicación Original</span><div class="info-value" id="assetUbicacion">-</div></div>
+                <div class="info-item"><span class="info-label">Responsable Original</span><div class="info-value" id="assetResponsable">-</div></div>
+                <div class="info-item"><span class="info-label">Estado Original</span><div class="info-value" id="assetEstadoOriginal">-</div></div>
+            </div>
+            <div class="update-section">
+                <h3 style="margin-bottom:0.4rem;">✏️ Registrar cambios</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nuevo Piso *</label>
+                        <select id="nuevoPiso" onchange="actualizarSubUbicaciones()">
+                            <option value="">Seleccionar...</option>
+                            <option value="PB">Planta Baja</option><option value="P1">Piso 1</option><option value="P2">Piso 2</option>
+                            <option value="P3">Piso 3</option><option value="Terraza">Terraza</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Ubicación Específica *</label>
+                        <select id="nuevaSubUbicacion" disabled><option>Primero elija piso</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Nuevo Responsable</label>
+                        <input type="text" id="nuevoResponsable" list="listaResponsables" placeholder="Nombre o seleccione..." autocomplete="off">
+                        <datalist id="listaResponsables">
+                            <option value="Liz Aliaga"><option value="Sol Alipaz"><option value="Tatiana Aenitez"><option value="Boris Aranisa"><option value="Luisa Canaviri"><option value="Manuel Chavez"><option value="Fernando Fernandez"><option value="Yolanda Flores"><option value="Marianne Gassenmeier"><option value="Armando Gonzales"><option value="Maks Gutierrez"><option value="Rosario Hinojosa"><option value="Lourdes Ibañez"><option value="Sara Lozano"><option value="Jose Marca"><option value="Abril Mercado"><option value="Carmen Pacheco"><option value="Lourdes Quispe"><option value="Said Ramirez"><option value="Marcela Raya"><option value="Fortunato Tarqui"><option value="Yessica Tarquino"><option value="Gabriela Torrez"><option value="Jorge Vasquez"><option value="Ronald Vidaurre"><option value="Rene Barcena"><option value="Adriana Gomez"><option value="Maria Jagatheswaran"><option value="Ricardo Alvarez"><option value="Enrique Ayo"><option value="Guillermo Beltran"><option value="Luis Daza"><option value="Alberto Gozalves"><option value="Andres Guzman"><option value="Osvaldo Irusta"><option value="Mauricio Maldonado"><option value="Claudia Oporto"><option value="Mario Patiño"><option value="Jamil Rodas"><option value="Jorge Rodriguez"><option value="Martin Salinas"><option value="Leonardo Taborga"><option value="Leonel Quispe"><option value="Milton Rios">
+                        </datalist>
+                    </div>
+                    <div class="form-group">
+                        <label>Nuevo Estado</label>
+                        <select id="nuevoEstado">
+                            <option value="">Sin cambios</option><option>Buen Estado</option><option>Mal Estado</option>
+                            <option>Obsoleto</option><option>En Movimiento</option><option>Revalúo</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="grid-column:1/-1;">
+                        <label>Observaciones</label>
+                        <textarea id="observaciones" rows="2" placeholder="Notas..."></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-success btn-sm" onclick="guardarCambios()">💾 Guardar cambios</button>
+                    <button class="btn btn-info btn-sm" onclick="marcarSinCambios()">✅ Sin cambios</button>
+                    <button class="btn btn-danger btn-sm" onclick="limpiarFormulario()">🧹 Limpiar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <h3>📋 Historial</h3>
+            <div style="display:flex; gap:0.4rem; margin:0.4rem 0;">
+                <input type="text" id="filterTable" placeholder="Filtrar historial..." style="flex:1; padding:0.4rem; border:1px solid var(--border); border-radius:6px;" onkeyup="filtrarTabla()">
+                <button class="btn btn-danger btn-sm" onclick="limpiarHistorial()">Limpiar</button>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th>Código</th><th>Nombre</th><th>Ub. Original</th><th>Nueva Ub.</th><th>Responsable</th><th>Estado</th><th>Tipo</th><th>Acciones</th></tr></thead>
+                    <tbody id="historyTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <nav class="bottom-nav" id="bottomNav">
+        <div class="nav-item active" onclick="mostrarSeccion('dashboard')"><i>📊</i><span>Inicio</span></div>
+        <div class="nav-item" onclick="mostrarSeccion('buscar')"><i>🔍</i><span>Buscar</span></div>
+        <div class="nav-item" onclick="mostrarSeccion('historial')"><i>📋</i><span>Historial</span></div>
+        <div class="nav-item" onclick="document.getElementById('fileInputXlsx').click()"><i>📂</i><span>Importar</span></div>
+        <div class="nav-item" onclick="toggleMenu()"><i>☰</i><span>Menú</span></div>
+    </nav>
+
+    <input type="file" id="fileInputXlsx" class="hidden-input" accept=".xlsx,.xls" onchange="importarArchivo(event)">
+    <input type="file" id="loadProgressInputXlsx" class="hidden-input" accept=".xlsx,.xls" onchange="cargarProgresoXLSX(event)">
+    <div id="toastContainer"></div>
+
+    <script>
+        const UBICACIONES_POR_PISO = {
+            'PB': ['AULA PLANA - PB','ADMISIONES - PB','DEP. CENTRO DE CÓMPUTO - PB','PASILLO - PB','RECEPCION - PB','ARCHIVO GENERAL - PB','DEPÓSITO - PB','ALMACEN MATERIALES - PB','DEPÓSITO MENSAJERIA - PB','BAÑO DE HOMBRES - PB','BAÑO DE MUJERES - PB'],
+            'P1': ['ARCHIVO CONTABILIDAD - P1','COWORK EPC-UCB - P1','SALA DE ESTUDIO 1 - P1','SALA DE ESTUDIO 2 - P1','SALA DE ESTUDIO 4 - P1','SALA DE ESTUDIO - P1','PASILLO - P1','AULA 1 - P1','AULA 2 - P1','SALA DE PROFESORES - P1','BAÑO DE HOMBRES - P1','BAÑO DE MUJERES - P1','BAÑO PARA PERSONAS CON CAPACIDADES DIFERENTES - P1'],
+            'P2': ['OF. PROFESOR T.C. 4 - P2','DIR. G.P.P. - P2','ASISTENCIA ADM POSGRADO - P2','DIR. EPC - P2','OF. CENTRO DE COMPUTO - P2','CONTABILIDAD - P2','PLATAFORMA VIRTUAL - P2','SALA DE SERVIDORES - P2','TESORERÍA - P2','CAJA - P2','KARDEX Y REGISTRO - P2','ASISTENTES 2 - P2','STRIA. ACADEMICA - P2','AULA CENTRO DE CÓMPUTO - P2','DIR. MFE - P2','OF. PROFESOR T.C. 1 - P2','OF. PROFESOR T.C. 2 - P2','OF. PROFESOR T.C. 3 - P2','PASILLO - P2','ARCHIVO DE KARDEX - P2','ASISTENTES 1 - P2','DIR. ADMINISTRATIVA - P2','SALA DE REUNIONES - P2','AULA 3 - P2','COCINETA - P2'],
+            'P3': ['DEP. 4 - P3','AULA P- P3','AULA 4 - P3','AULA 5 - P3','SALA DE ESTUDIO 5 - P3','SALA DE ESTUDIO 6 - P3','SALA DE ESTUDIO 7 - P3','SALA DE ESTUDIO 8 - P3','SALA DE ESTUDIO 9 - P3','SALA DE ESTUDIO 10 - P3','SALA DE ESTUDIO 11 - P3','PASILLO - P3','AULA MAGNA - P3','BAÑO DE HOMBRES - P3','BAÑO DE MUJERES - P3'],
+            'Terraza': ['TERRAZA']
+        };
+
+        let activosDB = [];
+        let activosMap = {};
+        let historialInventario = [];
+        let activoActual = null;
+        let resultadosBusqueda = [];
+        let indiceNavegacion = -1;
+        let filtroEstado = null;           
+        let filtroPiso = null;
+        let html5QrScanner = null;
+        let escaneando = false;
+        let intervaloExportacion = null;
+
+        // ===================== INICIALIZACIÓN =====================
+        function init() {
+            cargarEstadoGuardado();
+            actualizarDashboard();
+            actualizarTablaHistorial();
+            if (window.innerWidth <= 768) {
+                document.querySelector('.bottom-nav').style.display = 'flex';
+            } else {
+                document.querySelector('.bottom-nav').style.display = 'none';
+            }
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('data:application/javascript;base64,' + btoa(
+                        `const CACHE='inv2026-v2';self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(['/'])));});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(resp=>resp||fetch(e.request)));});`
+                    )).catch(()=>{});
+                });
+            }
+            window.addEventListener('pagehide', () => guardarEnLocalStorage());
+            window.addEventListener('pageshow', () => { cargarEstadoGuardado(); actualizarDashboard(); actualizarTablaHistorial(); });
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                document.getElementById('installBanner').style.display = 'block';
+            });
+            window.instalarApp = () => { if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt = null; document.getElementById('installBanner').style.display = 'none'; }); } };
+            window.addEventListener('appinstalled', () => { document.getElementById('installBanner').style.display = 'none'; });
+
+            if (intervaloExportacion) clearInterval(intervaloExportacion);
+            intervaloExportacion = setInterval(() => {
+                if (confirm('¿Desea exportar el progreso ahora?')) guardarProgresoXLSX();
+            }, 20 * 60 * 1000);
+        }
+
+        function cargarEstadoGuardado() {
+            const datos = localStorage.getItem('inventario2026_activos');
+            const hist = localStorage.getItem('inventario2026_historial');
+            if (datos) try { activosDB = JSON.parse(datos); reconstruirMapa(); } catch(e){}
+            if (hist) try { historialInventario = JSON.parse(hist); } catch(e){}
+        }
+
+        function guardarEnLocalStorage() {
+            localStorage.setItem('inventario2026_activos', JSON.stringify(activosDB));
+            localStorage.setItem('inventario2026_historial', JSON.stringify(historialInventario));
+        }
+
+        function reconstruirMapa() {
+            activosMap = {};
+            activosDB.forEach(a => { const cod = (a.CODIGOAF||'').trim(); if(cod) activosMap[cod] = a; });
+        }
+
+        function obtenerUbicacionOriginal(activo) {
+            return activo['NOM UBICACION'] || activo['NOMUBICACION'] || activo['NOM UBICACIÓN'] || activo['NOM_UBICACION'] || '';
+        }
+        function obtenerEstadoOriginal(activo) {
+            return activo['OBSERV ESTADO'] || activo['OBSERVESTADO'] || activo['ESTADOAF'] || '';
+        }
+
+        // ===================== IMPORTAR =====================
+        function importarArchivo(event) {
+            const file = event.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const wb = XLSX.read(data, {type:'array'});
+                const sheet = wb.Sheets[wb.SheetNames[0]];
+                const json = XLSX.utils.sheet_to_json(sheet, {defval:''});
+                if (!json.length) { mostrarToast('❌ Archivo vacío'); return; }
+                activosDB = json.map(row => {
+                    const newRow = {};
+                    Object.keys(row).forEach(key => {
+                        let cleanKey = key.trim();
+                        newRow[cleanKey] = row[key];
+                        let noSpaceKey = cleanKey.replace(/\s+/g, '');
+                        if (noSpaceKey !== cleanKey) newRow[noSpaceKey] = row[key];
+                    });
+                    newRow._estadoInventario = newRow._estadoInventario || 'pendiente';
+                    newRow._nuevaUbicacion = newRow._nuevaUbicacion || '';
+                    newRow._nuevoResponsable = newRow._nuevoResponsable || '';
+                    newRow._nuevoEstado = newRow._nuevoEstado || '';
+                    newRow._observaciones = newRow._observaciones || '';
+                    return newRow;
+                });
+                reconstruirMapa();
+                guardarEnLocalStorage();
+                actualizarDashboard();
+                actualizarTablaHistorial();
+                mostrarToast(`✅ ${activosDB.length} activos importados`);
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // ===================== ESCÁNER =====================
+        function toggleScanner() {
+            if (escaneando) { detenerScanner(); return; }
+            document.getElementById('cameraOverlay').classList.add('active');
+            document.getElementById('scanBtn').classList.add('active-scan');
+            escaneando = true;
+            html5QrScanner = new Html5Qrcode("reader");
+            html5QrScanner.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                (decoded) => {
+                    document.getElementById('searchInput').value = decoded;
+                    buscarActivo();
+                    detenerScanner();
+                },
+                (err) => {}
+            ).catch(() => { detenerScanner(); mostrarToast('Error de cámara', 'error'); });
+        }
+        function detenerScanner() {
+            if (html5QrScanner) { html5QrScanner.stop().then(() => html5QrScanner.clear()).catch(()=>{}); html5QrScanner = null; }
+            document.getElementById('cameraOverlay').classList.remove('active');
+            document.getElementById('scanBtn').classList.remove('active-scan');
+            escaneando = false;
+        }
+
+        // ===================== NUEVO ACTIVO =====================
+        function openNewAssetForm() {
+            document.getElementById('newAssetOverlay').classList.add('active');
+            document.getElementById('newCodigo').value = '';
+            document.getElementById('newNuevoPiso').value = '';
+            actualizarSubUbicaciones_New();
+            document.getElementById('newNuevoResponsable').value = '';
+            document.getElementById('newNuevoEstado').value = '';
+            document.getElementById('newObservaciones').value = '';
+        }
+        function closeNewAssetForm() { document.getElementById('newAssetOverlay').classList.remove('active'); }
+        function actualizarSubUbicaciones_New() {
+            const piso = document.getElementById('newNuevoPiso').value;
+            const sub = document.getElementById('newNuevaSubUbicacion');
+            sub.innerHTML = '<option value="">Seleccionar...</option>';
+            if (piso && UBICACIONES_POR_PISO[piso]) {
+                sub.disabled = false;
+                UBICACIONES_POR_PISO[piso].forEach(u => { const opt = document.createElement('option'); opt.value = u; opt.textContent = u; sub.appendChild(opt); });
+            } else { sub.disabled = true; }
+        }
+        function guardarNuevoActivo() {
+            const piso = document.getElementById('newNuevoPiso').value;
+            const sub = document.getElementById('newNuevaSubUbicacion').value;
+            if (!piso || !sub) { mostrarToast('Seleccione piso y ubicación', 'error'); return; }
+            const codigo = document.getElementById('newCodigo').value.trim() || ('NUEVO-' + Date.now());
+            const resp = document.getElementById('newNuevoResponsable').value.trim();
+            const estado = document.getElementById('newNuevoEstado').value;
+            const obs = document.getElementById('newObservaciones').value.trim();
+            const nuevoActivo = {
+                CODIGOAF: codigo,
+                NOMBREAF: '',
+                DESCAF: '',
+                'NOM UBICACION': '',
+                'NOM RESP ANT': '',
+                ESTADOAF: '',
+                'OBSERV ESTADO': estado,
+                _estadoInventario: 'nuevo',
+                _nuevaUbicacion: sub,
+                _nuevoResponsable: resp,
+                _nuevoEstado: estado,
+                _observaciones: obs,
+                _codigoAuto: codigo
+            };
+            activosDB.push(nuevoActivo);
+            reconstruirMapa();
+            guardarEnLocalStorage();
+            actualizarDashboard();
+            actualizarTablaHistorial();
+            mostrarToast('✅ Nuevo activo agregado');
+            closeNewAssetForm();
+        }
+
+        // ===================== BÚSQUEDA Y NAVEGACIÓN =====================
+        function buscarActivo() {
+            const codigo = document.getElementById('searchInput').value.trim();
+            if (!codigo) return;
+            const activo = activosMap[codigo];
+            if (activo) { resultadosBusqueda = [activo]; indiceNavegacion = 0; mostrarActivo(activo); return; }
+            const resultados = activosDB.filter(a => (a.CODIGOAF||'').toLowerCase().includes(codigo.toLowerCase()));
+            if (resultados.length === 1) { resultadosBusqueda = resultados; indiceNavegacion = 0; mostrarActivo(resultados[0]); }
+            else if (resultados.length > 1) { resultadosBusqueda = resultados; indiceNavegacion = 0; mostrarActivo(resultados[0]); mostrarToast(`🔍 ${resultados.length} resultados`); }
+            else { mostrarToast('❌ No encontrado'); }
+            document.getElementById('clearSearchBtn').style.display = 'inline-flex';
+        }
+        function limpiarBusqueda() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('assetDetail').classList.remove('active');
+            activoActual = null; resultadosBusqueda = []; indiceNavegacion = -1;
+            document.getElementById('clearSearchBtn').style.display = 'none';
+        }
+        function buscarPrimerPendiente() {
+            const pendientes = activosDB.filter(a => a._estadoInventario === 'pendiente');
+            if (!pendientes.length) { mostrarToast('🎉 Todos inventariados'); return; }
+            resultadosBusqueda = pendientes; indiceNavegacion = 0; mostrarActivo(pendientes[0]);
+            document.getElementById('clearSearchBtn').style.display = 'inline-flex';
+        }
+        function navegarActivo(dir) {
+            if (!resultadosBusqueda.length) return;
+            indiceNavegacion = (indiceNavegacion + dir + resultadosBusqueda.length) % resultadosBusqueda.length;
+            mostrarActivo(resultadosBusqueda[indiceNavegacion]);
+        }
+        function mostrarActivo(activo) {
+            activoActual = activo;
+            document.getElementById('assetDetail').classList.add('active');
+            document.getElementById('assetCode').textContent = activo.CODIGOAF || '-';
+            document.getElementById('assetNombre').textContent = activo.NOMBREAF || '-';
+            document.getElementById('assetDescripcion').textContent = activo.DESCAF || '-';
+            document.getElementById('assetUbicacion').textContent = obtenerUbicacionOriginal(activo);
+            document.getElementById('assetResponsable').textContent = activo['NOM RESP ANT'] || '';
+            document.getElementById('assetEstadoOriginal').textContent = obtenerEstadoOriginal(activo);
+            const badge = document.getElementById('assetStatusBadge');
+            badge.className = 'asset-status-badge';
+            const est = activo._estadoInventario || 'pendiente';
+            if (est === 'sin_cambio') { badge.classList.add('badge-sin-cambio'); badge.textContent = '✅ SIN CAMBIOS'; }
+            else if (est === 'con_cambio') { badge.classList.add('badge-cambio'); badge.textContent = '🔄 CON CAMBIOS'; }
+            else if (est === 'nuevo') { badge.classList.add('badge-nuevo'); badge.textContent = '🆕 NUEVO'; }
+            else { badge.classList.add('badge-pendiente'); badge.textContent = '⏳ PENDIENTE'; }
+            document.getElementById('navInfo').textContent = resultadosBusqueda.length > 1 ? `${indiceNavegacion+1}/${resultadosBusqueda.length}` : '';
+            document.getElementById('nuevoResponsable').value = activo._nuevoResponsable || '';
+            document.getElementById('nuevoEstado').value = activo._nuevoEstado || '';
+            document.getElementById('observaciones').value = activo._observaciones || '';
+            const nuevaUb = activo._nuevaUbicacion || '';
+            let pisoSel = '';
+            for (let [piso, ubs] of Object.entries(UBICACIONES_POR_PISO)) { if (ubs.includes(nuevaUb)) { pisoSel = piso; break; } }
+            document.getElementById('nuevoPiso').value = pisoSel;
+            actualizarSubUbicaciones();
+            document.getElementById('nuevaSubUbicacion').value = nuevaUb;
+            document.getElementById('searchInput').value = activo.CODIGOAF || '';
+            document.getElementById('clearSearchBtn').style.display = 'inline-flex';
+        }
+        function actualizarSubUbicaciones() {
+            const piso = document.getElementById('nuevoPiso').value;
+            const sub = document.getElementById('nuevaSubUbicacion');
+            sub.innerHTML = '<option value="">Seleccionar...</option>';
+            if (piso && UBICACIONES_POR_PISO[piso]) {
+                sub.disabled = false;
+                UBICACIONES_POR_PISO[piso].forEach(u => { const opt = document.createElement('option'); opt.value = u; opt.textContent = u; sub.appendChild(opt); });
+            } else { sub.disabled = true; }
+        }
+
+        // ===================== GUARDAR / MARCAR =====================
+        function guardarCambios() {
+            if (!activoActual) return;
+            const piso = document.getElementById('nuevoPiso').value;
+            const sub = document.getElementById('nuevaSubUbicacion').value;
+            if (!piso || !sub) { mostrarToast('Seleccione piso y ubicación', 'error'); return; }
+            const nuevaUb = sub;
+            const resp = document.getElementById('nuevoResponsable').value.trim();
+            const estadoSeleccionado = document.getElementById('nuevoEstado').value;
+            const obs = document.getElementById('observaciones').value.trim();
+            const ubicacionOriginal = obtenerUbicacionOriginal(activoActual);
+            const estadoOriginal = obtenerEstadoOriginal(activoActual);
+            const tipo = (nuevaUb !== ubicacionOriginal || resp !== (activoActual['NOM RESP ANT']||'') || estadoSeleccionado !== '') ? 'con_cambio' : 'sin_cambio';
+            const estadoFinal = estadoSeleccionado || estadoOriginal;
+            Object.assign(activoActual, {_estadoInventario: tipo, _nuevaUbicacion: nuevaUb, _nuevoResponsable: resp, _nuevoEstado: estadoFinal, _observaciones: obs});
+            const reg = {codigo: activoActual.CODIGOAF, nombre: activoActual.NOMBREAF, ubicacionOriginal, nuevaUbicacion: nuevaUb, responsableOriginal: activoActual['NOM RESP ANT']||'', nuevoResponsable: resp, estado: estadoFinal, tipo, observaciones: obs};
+            const idx = historialInventario.findIndex(h => h.codigo === reg.codigo);
+            if (idx>=0) historialInventario[idx] = reg; else historialInventario.push(reg);
+            guardarEnLocalStorage(); actualizarDashboard(); actualizarTablaHistorial();
+            mostrarToast('✅ Guardado');
+            setTimeout(() => buscarPrimerPendiente(), 800);
+        }
+        function marcarSinCambios() {
+            if (!activoActual) return;
+            const ubicacionOriginal = obtenerUbicacionOriginal(activoActual);
+            const estadoOriginal = obtenerEstadoOriginal(activoActual);
+            Object.assign(activoActual, {_estadoInventario:'sin_cambio', _nuevaUbicacion: ubicacionOriginal, _nuevoResponsable: activoActual['NOM RESP ANT']||'', _nuevoEstado: estadoOriginal, _observaciones:''});
+            const reg = {codigo: activoActual.CODIGOAF, nombre: activoActual.NOMBREAF, ubicacionOriginal, nuevaUbicacion: ubicacionOriginal, responsableOriginal: activoActual['NOM RESP ANT']||'', nuevoResponsable: activoActual['NOM RESP ANT']||'', estado: estadoOriginal, tipo:'sin_cambio', observaciones:''};
+            const idx = historialInventario.findIndex(h => h.codigo === reg.codigo);
+            if (idx>=0) historialInventario[idx] = reg; else historialInventario.push(reg);
+            guardarEnLocalStorage(); actualizarDashboard(); actualizarTablaHistorial();
+            mostrarToast('✅ Sin cambios');
+            setTimeout(() => buscarPrimerPendiente(), 800);
+        }
+        function limpiarFormulario() {
+            document.getElementById('nuevoPiso').value='';
+            actualizarSubUbicaciones();
+            document.getElementById('nuevoResponsable').value='';
+            document.getElementById('nuevoEstado').value='';
+            document.getElementById('observaciones').value='';
+        }
+
+        // ===================== DASHBOARD =====================
+        function actualizarDashboard() {
+            const total = activosDB.length;
+            const pendientes = activosDB.filter(a=>a._estadoInventario==='pendiente').length;
+            const sin = activosDB.filter(a=>a._estadoInventario==='sin_cambio').length;
+            const con = activosDB.filter(a=>a._estadoInventario==='con_cambio').length;
+            const nuevos = activosDB.filter(a=>a._estadoInventario==='nuevo').length;
+            const inventariados = sin + con + nuevos;
+            const pct = total ? Math.round((inventariados / total) * 100) : 0;
+            document.getElementById('totalActivos').textContent = total;
+            document.getElementById('pendientes').textContent = pendientes;
+            document.getElementById('inventariados').textContent = inventariados;
+            document.getElementById('conCambios').textContent = con;
+            document.getElementById('porcentajeProgreso').textContent = pct + '%';
+            document.getElementById('progressBar').style.width = pct + '%';
+            document.getElementById('progressBar').textContent = pct > 0 ? pct + '%' : '';
+            document.getElementById('progressText').textContent = `${inventariados} de ${total} activos inventariados`;
+        }
+
+        // ===================== FILTROS =====================
+        function toggleStateFilter(tipo, el) {
+            if (filtroEstado === tipo) {
+                filtroEstado = null;
+                el.classList.remove('active');
+            } else {
+                document.querySelectorAll('.filter-chip[data-filter="todos"], .filter-chip[data-filter="pendiente"], .filter-chip[data-filter="sin_cambio"], .filter-chip[data-filter="con_cambio"], .filter-chip[data-filter="nuevo"]')
+                    .forEach(c => c.classList.remove('active'));
+                filtroEstado = tipo;
+                el.classList.add('active');
+            }
+            actualizarTablaHistorial();
+        }
+        function togglePisoFilter(piso, el) {
+            if (filtroPiso === piso) {
+                filtroPiso = null;
+                el.classList.remove('active');
+            } else {
+                document.querySelectorAll('.filter-chip[data-filter="PB"], .filter-chip[data-filter="P1"], .filter-chip[data-filter="P2"], .filter-chip[data-filter="P3"], .filter-chip[data-filter="Terraza"]')
+                    .forEach(c => c.classList.remove('active'));
+                filtroPiso = piso;
+                el.classList.add('active');
+            }
+            actualizarTablaHistorial();
+        }
+        function filtrarTabla() { actualizarTablaHistorial(); }
+
+        function actualizarTablaHistorial() {
+            const tbody = document.getElementById('historyTableBody');
+            const texto = (document.getElementById('filterTable')?.value || '').toLowerCase();
+            let datos = [...historialInventario];
+            // Pendientes no registrados
+            activosDB.filter(a => a._estadoInventario === 'pendiente' && !datos.some(h => h.codigo === a.CODIGOAF))
+                .forEach(a => datos.push({ codigo: a.CODIGOAF, nombre: a.NOMBREAF, ubicacionOriginal: obtenerUbicacionOriginal(a), nuevaUbicacion: '', nuevoResponsable: '', estado: obtenerEstadoOriginal(a), tipo: 'pendiente', observaciones: '' }));
+            // Nuevos no registrados
+            activosDB.filter(a => a._estadoInventario === 'nuevo' && !datos.some(h => h.codigo === a.CODIGOAF))
+                .forEach(a => datos.push({ codigo: a.CODIGOAF, nombre: a.NOMBREAF || '(Nuevo)', ubicacionOriginal: '', nuevaUbicacion: a._nuevaUbicacion, nuevoResponsable: a._nuevoResponsable, estado: a._nuevoEstado || '', tipo: 'nuevo', observaciones: a._observaciones }));
+
+            if (filtroEstado === null) {
+                datos = datos.filter(h => h.tipo === 'sin_cambio' || h.tipo === 'con_cambio');
+            } else if (filtroEstado !== 'todos') {
+                datos = datos.filter(h => h.tipo === filtroEstado);
+            }
+            if (filtroPiso) {
+                datos = datos.filter(h => {
+                    if (h.tipo === 'pendiente') return UBICACIONES_POR_PISO[filtroPiso].some(u => h.ubicacionOriginal.includes(u));
+                    else if (h.tipo === 'nuevo') return UBICACIONES_POR_PISO[filtroPiso].includes(h.nuevaUbicacion);
+                    else return h.nuevaUbicacion && UBICACIONES_POR_PISO[filtroPiso].includes(h.nuevaUbicacion);
+                });
+            }
+            if (texto) datos = datos.filter(h => (h.codigo||'').toLowerCase().includes(texto) || (h.nombre||'').toLowerCase().includes(texto));
+            if (!datos.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty-state">📭 Sin registros</td></tr>'; return; }
+            tbody.innerHTML = datos.map(h => `
+                <tr class="${h.tipo==='con_cambio'?'con-cambio': (h.tipo==='pendiente'?'pendiente': (h.tipo==='nuevo'?'nuevo':'inventariado'))}">
+                    <td><strong>${h.codigo}</strong></td><td>${h.nombre||''}</td><td>${h.ubicacionOriginal||''}</td>
+                    <td>${h.nuevaUbicacion||''}</td><td>${h.nuevoResponsable||''}</td><td>${h.estado||''}</td>
+                    <td>${h.tipo==='con_cambio'?'🔄 Con cambios': (h.tipo==='pendiente'?'⏳ Pendiente': (h.tipo==='nuevo'?'🆕 Nuevo':'✅ Sin cambios'))}</td>
+                    <td>
+                        <button class="action-btn" onclick="eliminarRegistro('${h.codigo}')" title="Eliminar">🗑️</button>
+                        <button class="action-btn" onclick="editarRegistro('${h.codigo}')" title="Editar">✏️</button>
+                    </td>
+                </tr>`).join('');
+        }
+
+        function eliminarRegistro(codigo) {
+            if (!confirm('¿Eliminar este registro?')) return;
+            const activo = activosDB.find(a => a.CODIGOAF === codigo);
+            if (activo) {
+                if (activo._estadoInventario === 'nuevo') {
+                    activosDB = activosDB.filter(a => a.CODIGOAF !== codigo);
+                } else {
+                    activo._estadoInventario = 'pendiente';
+                    activo._nuevaUbicacion = '';
+                    activo._nuevoResponsable = '';
+                    activo._nuevoEstado = '';
+                    activo._observaciones = '';
+                }
+                reconstruirMapa();
+            }
+            historialInventario = historialInventario.filter(h => h.codigo !== codigo);
+            guardarEnLocalStorage();
+            actualizarDashboard();
+            actualizarTablaHistorial();
+            mostrarToast('Registro eliminado');
+        }
+
+        function editarRegistro(codigo) {
+            const activo = activosDB.find(a => a.CODIGOAF === codigo);
+            if (!activo) return;
+            resultadosBusqueda = [activo];
+            indiceNavegacion = 0;
+            mostrarActivo(activo);
+            document.getElementById('assetDetail').scrollIntoView({behavior:'smooth'});
+        }
+
+        function limpiarHistorial() {
+            if (confirm('¿Limpiar TODO el historial? Los activos volverán a pendiente (excepto nuevos, que serán eliminados).')) {
+                activosDB = activosDB.filter(a => a._estadoInventario !== 'nuevo');
+                activosDB.forEach(a => {
+                    a._estadoInventario = 'pendiente';
+                    a._nuevaUbicacion = '';
+                    a._nuevoResponsable = '';
+                    a._nuevoEstado = '';
+                    a._observaciones = '';
+                });
+                historialInventario = [];
+                reconstruirMapa();
+                guardarEnLocalStorage();
+                actualizarDashboard();
+                actualizarTablaHistorial();
+                mostrarToast('Historial y nuevos activos eliminados');
+            }
+        }
+
+        // ===================== EXPORTAR / GUARDAR =====================
+        function descargarXLSX(wb, nombreArchivo) {
+            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([wbout], { type: 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = nombreArchivo;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+        }
+
+        function guardarProgresoXLSX() {
+            if (!activosDB.length) { mostrarToast('⚠️ Sin datos'); return; }
+            const activosInventario = activosDB.filter(a => a._estadoInventario !== 'nuevo');
+            const nuevosActivos = activosDB.filter(a => a._estadoInventario === 'nuevo');
+            const hojaInventario = activosInventario.map(a => ({
+                CODIGOAF: a.CODIGOAF, NOMBREAF: a.NOMBREAF, DESCAF: a.DESCAF,
+                'UBICACION ORIGINAL': obtenerUbicacionOriginal(a),
+                'RESPONSABLE ORIGINAL': a['NOM RESP ANT'] || '',
+                'ESTADO ORIGINAL': obtenerEstadoOriginal(a),
+                'NUEVA UBICACION': a._estadoInventario === 'pendiente' ? '' : a._nuevaUbicacion,
+                'NUEVO RESPONSABLE': a._estadoInventario === 'pendiente' ? '' : a._nuevoResponsable,
+                'NUEVO ESTADO': a._estadoInventario === 'pendiente' ? '' : (a._nuevoEstado || obtenerEstadoOriginal(a)),
+                OBSERVACIONES: a._estadoInventario === 'pendiente' ? '' : a._observaciones,
+                'ESTADO INVENTARIO': a._estadoInventario
+            }));
+            const hojaNuevos = nuevosActivos.map(a => ({
+                CODIGOAF: a.CODIGOAF, NOMBREAF: a.NOMBREAF || '', DESCAF: a.DESCAF || '',
+                'UBICACION ORIGINAL': '',
+                'RESPONSABLE ORIGINAL': '',
+                'ESTADO ORIGINAL': '',
+                'NUEVA UBICACION': a._nuevaUbicacion,
+                'NUEVO RESPONSABLE': a._nuevoResponsable,
+                'NUEVO ESTADO': a._nuevoEstado,
+                OBSERVACIONES: a._observaciones,
+                'ESTADO INVENTARIO': 'nuevo'
+            }));
+            const wb = XLSX.utils.book_new();
+            if (hojaInventario.length) { const ws = XLSX.utils.json_to_sheet(hojaInventario); XLSX.utils.book_append_sheet(wb, ws, 'Inventario'); }
+            if (hojaNuevos.length) { const ws = XLSX.utils.json_to_sheet(hojaNuevos); XLSX.utils.book_append_sheet(wb, ws, 'Nuevos Activos'); }
+            descargarXLSX(wb, 'Progreso_Inventario_2026.xlsx');
+            mostrarToast('💾 Progreso guardado (2 hojas)');
+        }
+
+        function exportarExcel() { guardarProgresoXLSX(); }
+
+        function cargarProgresoXLSX(event) {
+            const file = event.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const wb = XLSX.read(data, {type:'array'});
+                const sheet = wb.Sheets[wb.SheetNames[0]];
+                const json = XLSX.utils.sheet_to_json(sheet, {defval:''});
+                if (json.length) {
+                    activosDB = json.map(a => ({
+                        ...a,
+                        _estadoInventario: a['ESTADO INVENTARIO'] || 'pendiente',
+                        _nuevaUbicacion: a['NUEVA UBICACION'] || '',
+                        _nuevoResponsable: a['NUEVO RESPONSABLE'] || '',
+                        _nuevoEstado: a['NUEVO ESTADO'] || '',
+                        _observaciones: a.OBSERVACIONES || ''
+                    }));
+                    reconstruirMapa(); guardarEnLocalStorage(); actualizarDashboard(); actualizarTablaHistorial();
+                    mostrarToast('📥 Progreso cargado');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function toggleMenu() { document.getElementById('menuOverlay').classList.toggle('active'); }
+        function closeMenu(e) { if (e.target === document.getElementById('menuOverlay')) document.getElementById('menuOverlay').classList.remove('active'); }
+        function closeMenuDirect() { document.getElementById('menuOverlay').classList.remove('active'); }
+
+        function mostrarToast(msg, tipo='info') {
+            const cont = document.getElementById('toastContainer');
+            const t = document.createElement('div'); t.className = `toast ${tipo}`; t.textContent = msg;
+            cont.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        function mostrarSeccion(sec) {
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(el => el.classList.remove('active'));
+            const items = document.querySelectorAll('.bottom-nav .nav-item');
+            if (sec === 'dashboard') { items[0].classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
+            else if (sec === 'buscar') { items[1].classList.add('active'); document.getElementById('searchInput').focus(); }
+            else if (sec === 'historial') { items[2].classList.add('active'); document.querySelector('.history-section').scrollIntoView({behavior:'smooth'}); }
+            else if (sec === 'importar') { items[3].classList.add('active'); }
+        }
+
+        window.addEventListener('resize', () => {
+            document.querySelector('.bottom-nav').style.display = window.innerWidth <= 768 ? 'flex' : 'none';
+        });
+
+        init();
+    </script>
+</body>
+</html>
