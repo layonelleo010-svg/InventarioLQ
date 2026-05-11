@@ -93,7 +93,6 @@
         .toast.success { background: #2e7d32; } .toast.error { background: #c62828; } .toast.info { background: #1565c0; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } }
         .hidden-input { display: none; }
-        .inline-group { display: flex; gap: 0.5rem; align-items: center; }
         @media (max-width: 768px) {
             .header-content { flex-direction: column; align-items: stretch; } .header h1 { text-align: center; }
             .header-actions { justify-content: center; gap: 0.3rem; flex-wrap: wrap; }
@@ -159,28 +158,7 @@
                 </div>
                 <div class="form-group">
                     <label>Nuevo Responsable</label>
-                    <select id="newNuevoResponsable" onchange="toggleOtroCampo('newNuevoResponsable','newOtroResponsable')">
-                        <option value="">Seleccionar...</option>
-                        <optgroup label="Personal">
-                            <option>Liz Aliaga</option><option>Sol Alipaz</option><option>Tatiana Aenitez</option>
-                            <option>Boris Aranisa</option><option>Luisa Canaviri</option><option>Manuel Chavez</option>
-                            <option>Fernando Fernandez</option><option>Yolanda Flores</option><option>Marianne Gassenmeier</option>
-                            <option>Armando Gonzales</option><option>Maks Gutierrez</option><option>Rosario Hinojosa</option>
-                            <option>Lourdes Ibañez</option><option>Sara Lozano</option><option>Jose Marca</option>
-                            <option>Abril Mercado</option><option>Carmen Pacheco</option><option>Lourdes Quispe</option>
-                            <option>Said Ramirez</option><option>Marcela Raya</option><option>Fortunato Tarqui</option>
-                            <option>Yessica Tarquino</option><option>Gabriela Torrez</option><option>Jorge Vasquez</option>
-                            <option>Ronald Vidaurre</option><option>Rene Barcena</option><option>Adriana Gomez</option>
-                            <option>Maria Jagatheswaran</option><option>Ricardo Alvarez</option><option>Enrique Ayo</option>
-                            <option>Guillermo Beltran</option><option>Luis Daza</option><option>Alberto Gozalves</option>
-                            <option>Andres Guzman</option><option>Osvaldo Irusta</option><option>Mauricio Maldonado</option>
-                            <option>Claudia Oporto</option><option>Mario Patiño</option><option>Jamil Rodas</option>
-                            <option>Jorge Rodriguez</option><option>Martin Salinas</option><option>Leonardo Taborga</option>
-                            <option>Leonel Quispe</option><option>Milton Rios</option>
-                        </optgroup>
-                        <option value="__otro__">– Otro –</option>
-                    </select>
-                    <input type="text" id="newOtroResponsable" placeholder="Escriba el nombre" style="display:none; margin-top:0.3rem;">
+                    <input type="text" id="newNuevoResponsable" list="listaResponsables" placeholder="Escriba o seleccione..." autocomplete="off">
                 </div>
                 <div class="form-group">
                     <label>Nuevo Estado</label>
@@ -278,28 +256,7 @@
                     </div>
                     <div class="form-group">
                         <label>Nuevo Responsable</label>
-                        <select id="nuevoResponsable" onchange="toggleOtroCampo('nuevoResponsable','otroResponsable')">
-                            <option value="">Seleccionar...</option>
-                            <optgroup label="Personal">
-                                <option>Liz Aliaga</option><option>Sol Alipaz</option><option>Tatiana Aenitez</option>
-                                <option>Boris Aranisa</option><option>Luisa Canaviri</option><option>Manuel Chavez</option>
-                                <option>Fernando Fernandez</option><option>Yolanda Flores</option><option>Marianne Gassenmeier</option>
-                                <option>Armando Gonzales</option><option>Maks Gutierrez</option><option>Rosario Hinojosa</option>
-                                <option>Lourdes Ibañez</option><option>Sara Lozano</option><option>Jose Marca</option>
-                                <option>Abril Mercado</option><option>Carmen Pacheco</option><option>Lourdes Quispe</option>
-                                <option>Said Ramirez</option><option>Marcela Raya</option><option>Fortunato Tarqui</option>
-                                <option>Yessica Tarquino</option><option>Gabriela Torrez</option><option>Jorge Vasquez</option>
-                                <option>Ronald Vidaurre</option><option>Rene Barcena</option><option>Adriana Gomez</option>
-                                <option>Maria Jagatheswaran</option><option>Ricardo Alvarez</option><option>Enrique Ayo</option>
-                                <option>Guillermo Beltran</option><option>Luis Daza</option><option>Alberto Gozalves</option>
-                                <option>Andres Guzman</option><option>Osvaldo Irusta</option><option>Mauricio Maldonado</option>
-                                <option>Claudia Oporto</option><option>Mario Patiño</option><option>Jamil Rodas</option>
-                                <option>Jorge Rodriguez</option><option>Martin Salinas</option><option>Leonardo Taborga</option>
-                                <option>Leonel Quispe</option><option>Milton Rios</option>
-                            </optgroup>
-                            <option value="__otro__">– Otro –</option>
-                        </select>
-                        <input type="text" id="otroResponsable" placeholder="Escriba el nombre" style="display:none; margin-top:0.3rem;">
+                        <input type="text" id="nuevoResponsable" list="listaResponsables" placeholder="Escriba o seleccione..." autocomplete="off">
                     </div>
                     <div class="form-group">
                         <label>Nuevo Estado</label>
@@ -346,6 +303,26 @@
 
     <input type="file" id="fileInputXlsx" class="hidden-input" accept=".xlsx,.xls" onchange="importarArchivo(event)">
     <input type="file" id="loadProgressInputXlsx" class="hidden-input" accept=".xlsx,.xls" onchange="cargarProgresoXLSX(event)">
+    
+    <!-- Lista compartida de responsables para el datalist -->
+    <datalist id="listaResponsables">
+        <option>Liz Aliaga</option><option>Sol Alipaz</option><option>Tatiana Aenitez</option>
+        <option>Boris Aranisa</option><option>Luisa Canaviri</option><option>Manuel Chavez</option>
+        <option>Fernando Fernandez</option><option>Yolanda Flores</option><option>Marianne Gassenmeier</option>
+        <option>Armando Gonzales</option><option>Maks Gutierrez</option><option>Rosario Hinojosa</option>
+        <option>Lourdes Ibañez</option><option>Sara Lozano</option><option>Jose Marca</option>
+        <option>Abril Mercado</option><option>Carmen Pacheco</option><option>Lourdes Quispe</option>
+        <option>Said Ramirez</option><option>Marcela Raya</option><option>Fortunato Tarqui</option>
+        <option>Yessica Tarquino</option><option>Gabriela Torrez</option><option>Jorge Vasquez</option>
+        <option>Ronald Vidaurre</option><option>Rene Barcena</option><option>Adriana Gomez</option>
+        <option>Maria Jagatheswaran</option><option>Ricardo Alvarez</option><option>Enrique Ayo</option>
+        <option>Guillermo Beltran</option><option>Luis Daza</option><option>Alberto Gozalves</option>
+        <option>Andres Guzman</option><option>Osvaldo Irusta</option><option>Mauricio Maldonado</option>
+        <option>Claudia Oporto</option><option>Mario Patiño</option><option>Jamil Rodas</option>
+        <option>Jorge Rodriguez</option><option>Martin Salinas</option><option>Leonardo Taborga</option>
+        <option>Leonel Quispe</option><option>Milton Rios</option>
+    </datalist>
+
     <div id="toastContainer"></div>
 
     <script>
@@ -466,7 +443,7 @@
         function obtenerDimensionesQrBox() {
             const vw = window.innerWidth;
             const vh = window.innerHeight;
-            const size = Math.min(vw * 0.8, vh * 0.6, 400);
+            const size = Math.min(vw * 0.85, vh * 0.7, 500);
             return { width: size, height: size };
         }
 
@@ -495,14 +472,13 @@
             escaneando = false;
         }
 
-        // ===================== RESTO DE FUNCIONES (SIN CAMBIOS) =====================
+        // ===================== NUEVO ACTIVO =====================
         function openNewAssetForm() {
             document.getElementById('newAssetOverlay').classList.add('active');
             document.getElementById('newCodigo').value = '';
             document.getElementById('newNuevoPiso').value = '';
             actualizarSubUbicaciones_New();
             document.getElementById('newNuevoResponsable').value = '';
-            document.getElementById('newOtroResponsable').style.display = 'none';
             document.getElementById('newNuevoEstado').value = '';
             document.getElementById('newObservaciones').value = '';
         }
@@ -521,9 +497,7 @@
             const sub = document.getElementById('newNuevaSubUbicacion').value;
             if (!piso || !sub) { mostrarToast('Seleccione piso y ubicación', 'error'); return; }
             const codigo = document.getElementById('newCodigo').value.trim() || ('NUEVO-' + Date.now());
-            const respSelect = document.getElementById('newNuevoResponsable').value;
-            const respOtro = document.getElementById('newOtroResponsable').value.trim();
-            const resp = (respSelect === '__otro__') ? respOtro : respSelect;
+            const resp = document.getElementById('newNuevoResponsable').value.trim();
             const estado = document.getElementById('newNuevoEstado').value;
             const obs = document.getElementById('newObservaciones').value.trim();
             const nuevoActivo = {
@@ -550,6 +524,7 @@
             closeNewAssetForm();
         }
 
+        // ===================== BÚSQUEDA Y NAVEGACIÓN =====================
         function buscarActivo() {
             const codigo = document.getElementById('searchInput').value.trim();
             if (!codigo) return;
@@ -595,21 +570,8 @@
             else if (est === 'nuevo') { badge.classList.add('badge-nuevo'); badge.textContent = '🆕 NUEVO'; }
             else { badge.classList.add('badge-pendiente'); badge.textContent = '⏳ PENDIENTE'; }
             document.getElementById('navInfo').textContent = resultadosBusqueda.length > 1 ? `${indiceNavegacion+1}/${resultadosBusqueda.length}` : '';
-            const respSelect = document.getElementById('nuevoResponsable');
-            const respOtro = document.getElementById('otroResponsable');
-            const respGuardado = activo._nuevoResponsable || '';
-            const listaResponsables = Array.from(respSelect.options).map(o => o.value);
-            if (listaResponsables.includes(respGuardado)) {
-                respSelect.value = respGuardado;
-                respOtro.style.display = 'none';
-            } else if (respGuardado) {
-                respSelect.value = '__otro__';
-                respOtro.style.display = 'block';
-                respOtro.value = respGuardado;
-            } else {
-                respSelect.value = '';
-                respOtro.style.display = 'none';
-            }
+            // Cargar responsable actual en el input
+            document.getElementById('nuevoResponsable').value = activo._nuevoResponsable || '';
             document.getElementById('nuevoEstado').value = activo._nuevoEstado || '';
             document.getElementById('observaciones').value = activo._observaciones || '';
             const nuevaUb = activo._nuevaUbicacion || '';
@@ -631,20 +593,14 @@
             } else { sub.disabled = true; }
         }
 
-        function obtenerResponsableFinal(idSelect, idOtro) {
-            const select = document.getElementById(idSelect);
-            const otro = document.getElementById(idOtro);
-            if (select.value === '__otro__') return otro.value.trim();
-            return select.value;
-        }
-
+        // ===================== GUARDAR / MARCAR =====================
         function guardarCambios() {
             if (!activoActual) return;
             const piso = document.getElementById('nuevoPiso').value;
             const sub = document.getElementById('nuevaSubUbicacion').value;
             if (!piso || !sub) { mostrarToast('Seleccione piso y ubicación', 'error'); return; }
             const nuevaUb = sub;
-            const resp = obtenerResponsableFinal('nuevoResponsable', 'otroResponsable');
+            const resp = document.getElementById('nuevoResponsable').value.trim();
             const estadoSeleccionado = document.getElementById('nuevoEstado').value;
             const obs = document.getElementById('observaciones').value.trim();
             const ubicacionOriginal = obtenerUbicacionOriginal(activoActual);
@@ -675,11 +631,11 @@
             document.getElementById('nuevoPiso').value='';
             actualizarSubUbicaciones();
             document.getElementById('nuevoResponsable').value='';
-            document.getElementById('otroResponsable').style.display='none';
             document.getElementById('nuevoEstado').value='';
             document.getElementById('observaciones').value='';
         }
 
+        // ===================== DASHBOARD =====================
         function actualizarDashboard() {
             const total = activosDB.length;
             const pendientes = activosDB.filter(a=>a._estadoInventario==='pendiente').length;
@@ -698,6 +654,7 @@
             document.getElementById('progressText').textContent = `${inventariados} de ${total} activos inventariados`;
         }
 
+        // ===================== FILTROS =====================
         function toggleStateFilter(tipo, el) {
             if (filtroEstado === tipo) {
                 filtroEstado = null;
@@ -809,6 +766,7 @@
             }
         }
 
+        // ===================== EXPORTAR / GUARDAR =====================
         function descargarXLSX(wb, nombreArchivo) {
             const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
             const blob = new Blob([wbout], { type: 'application/octet-stream' });
@@ -880,16 +838,7 @@
             reader.readAsArrayBuffer(file);
         }
 
-        function toggleOtroCampo(idSelect, idOtro) {
-            const select = document.getElementById(idSelect);
-            const otro = document.getElementById(idOtro);
-            if (select.value === '__otro__') {
-                otro.style.display = 'block';
-            } else {
-                otro.style.display = 'none';
-            }
-        }
-
+        // ===================== UTILIDADES =====================
         function toggleMenu() { document.getElementById('menuOverlay').classList.toggle('active'); }
         function closeMenu(e) { if (e.target === document.getElementById('menuOverlay')) document.getElementById('menuOverlay').classList.remove('active'); }
         function closeMenuDirect() { document.getElementById('menuOverlay').classList.remove('active'); }
