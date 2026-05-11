@@ -17,16 +17,19 @@
             --primary: #1a237e; --primary-light: #283593; --accent: #ff6f00; --success: #2e7d32;
             --warning: #f57c00; --danger: #c62828; --info: #1565c0; --bg: #f5f5f5; --card: #ffffff;
             --border: #e0e0e0; --text: #212121; --text-secondary: #616161; --shadow: 0 2px 8px rgba(0,0,0,0.1);
-            --radius: 12px; --bottom-nav-height: 60px;
+            --radius: 12px; --bottom-nav-height: 65px;
         }
-        body { 
-            background: var(--bg); color: var(--text); min-height: 100vh; 
-            -webkit-tap-highlight-color: transparent; user-select: none; 
-            overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
-        }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; -webkit-tap-highlight-color: transparent; user-select: none; }
         .header { background: linear-gradient(135deg, var(--primary) 0%, #0d1b5e 100%); color: white; padding: 0.75rem 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.2); position: sticky; top: 0; z-index: 100; }
         .header-content { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
         .header h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: 0.3px; } .header h1 span { color: #ffab40; }
+        .btn { padding: 0.5rem 0.9rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.75rem; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.3rem; white-space: nowrap; background: transparent; color: inherit; touch-action: manipulation; user-select: none; }
+        .btn-primary { background: var(--accent); color: white; } .btn-primary:active { background: #e65100; transform: scale(0.96); }
+        .btn-secondary { background: white; color: var(--primary); border: 2px solid var(--primary); } .btn-secondary:active { background: #e8eaf6; }
+        .btn-success { background: var(--success); color: white; } .btn-info { background: var(--info); color: white; }
+        .btn-warning { background: var(--warning); color: white; } .btn-danger { background: var(--danger); color: white; }
+        .btn-outline { background: transparent; color: white; border: 2px solid rgba(255,255,255,0.5); } .btn-outline:active { background: rgba(255,255,255,0.1); }
+        .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.7rem; }
         .main-container { max-width: 1400px; margin: 0 auto; padding: 0.75rem; padding-bottom: calc(var(--bottom-nav-height) + 1rem); }
         .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.6rem; margin-bottom: 0.75rem; }
         .stat-card { background: var(--card); border-radius: var(--radius); padding: 0.8rem; box-shadow: var(--shadow); border-left: 4px solid transparent; cursor: pointer; transition: transform 0.2s; }
@@ -95,8 +98,8 @@
         .menu-panel { background: var(--card); border-radius: var(--radius); padding: 1rem; min-width: 200px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
         .menu-panel .menu-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.8rem; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 500; color: var(--text); transition: background 0.2s; }
         .menu-panel .menu-item:active { background: #f0f0f0; }
-        .camera-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 300; }
-        .camera-overlay.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .camera-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 300; flex-direction: column; align-items: center; justify-content: center; }
+        .camera-overlay.active { display: flex; }
         #reader { width: 100%; height: 100%; }
         #qr-shaded-region { display: none !important; }
         .close-camera-btn { position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.5rem; cursor: pointer; z-index: 301; display: flex; align-items: center; justify-content: center; }
@@ -316,7 +319,7 @@
     <input type="file" id="fileInputXlsx" class="hidden-input" accept=".xlsx,.xls" onchange="importarArchivo(event)">
     <input type="file" id="loadProgressInputXlsx" class="hidden-input" accept=".xlsx,.xls" onchange="cargarProgresoXLSX(event)">
     
-    <!-- Lista compartida de responsables -->
+    <!-- Lista compartida de responsables para el datalist -->
     <datalist id="listaResponsables">
         <option>Liz Aliaga</option><option>Sol Alipaz</option><option>Tatiana Aenitez</option>
         <option>Boris Aranisa</option><option>Luisa Canaviri</option><option>Manuel Chavez</option>
@@ -863,7 +866,6 @@
             else if (sec === 'importar') { items[3].classList.add('active'); }
         }
 
-        // No necesitamos resize para la barra inferior
         init();
     </script>
 </body>
