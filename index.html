@@ -218,8 +218,8 @@
         <div class="search-section">
             <div class="search-row">
                 <div class="search-input-group">
-                    <input type="text" class="search-input" id="searchInput" placeholder="🔍 Código de activo..." onkeyup="if(event.key==='Enter') buscarActivo()">
-                    <button class="search-btn" onclick="buscarActivo()">Buscar</button>
+                    <input type="text" class="search-input" id="searchInput" placeholder="🔍 Ej: E72" onkeyup="if(event.key==='Enter') buscarActivo()" inputmode="numeric" pattern="[0-9]*">
+                    <button class="search-btn" onclick="prepararBusqueda()">Buscar</button>
                 </div>
                 <button class="clear-search-btn" id="clearSearchBtn" onclick="limpiarBusqueda()">✖️</button>
                 <button class="scan-btn" id="scanBtn" onclick="toggleScanner()">📷</button>
@@ -239,6 +239,9 @@
                 </select>
                 <select id="filtroUbicacionSelect" class="filter-select" onchange="cambiarFiltroUbicacion()">
                     <option value="">📍 Todas las ubicaciones</option>
+                </select>
+                <select id="filtroResponsableSelect" class="filter-select" onchange="cambiarFiltroResponsable()">
+                    <option value="">👤 Todos los responsables</option>
                 </select>
             </div>
         </div>
@@ -360,6 +363,17 @@
             'Terraza': ['TERRAZA']
         };
 
+        const LISTA_RESPONSABLES = [
+            "Liz Aliaga","Sol Alipaz","Tatiana Aenitez","Boris Aranisa","Luisa Canaviri","Manuel Chavez",
+            "Fernando Fernandez","Yolanda Flores","Marianne Gassenmeier","Armando Gonzales","Maks Gutierrez",
+            "Rosario Hinojosa","Lourdes Ibañez","Sara Lozano","Jose Marca","Abril Mercado","Carmen Pacheco",
+            "Lourdes Quispe","Said Ramirez","Marcela Raya","Fortunato Tarqui","Yessica Tarquino","Gabriela Torrez",
+            "Jorge Vasquez","Ronald Vidaurre","Rene Barcena","Adriana Gomez","Maria Jagatheswaran","Ricardo Alvarez",
+            "Enrique Ayo","Guillermo Beltran","Luis Daza","Alberto Gozalves","Andres Guzman","Osvaldo Irusta",
+            "Mauricio Maldonado","Claudia Oporto","Mario Patiño","Jamil Rodas","Jorge Rodriguez","Martin Salinas",
+            "Leonardo Taborga","Leonel Quispe","Milton Rios"
+        ];
+
         let activosDB = [];
         let activosMap = {};
         let historialInventario = [];
@@ -368,7 +382,8 @@
         let indiceNavegacion = -1;
         let filtroEstado = null;           
         let filtroPiso = null;
-        let filtroUbicacion = null;      // nueva variable para filtro de ubicación específica
+        let filtroUbicacion = null;
+        let filtroResponsable = null;   // nuevo filtro por responsable
         let html5QrScanner = null;
         let escaneando = false;
         let intervaloExportacion = null;
@@ -378,7 +393,8 @@
             cargarEstadoGuardado();
             actualizarDashboard();
             actualizarTablaHistorial();
-            actualizarSelectUbicaciones(); // poblar el select de ubicaciones
+            actualizarSelectUbicaciones();
+            actualizarSelectResponsables();   // poblar el select de responsables
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
                     navigator.serviceWorker.register('data:application/javascript;base64,' + btoa(
@@ -420,11 +436,11 @@
             activosDB.forEach(a => { const cod = (a.CODIGOAF||'').trim(); if(cod) activosMap[cod] = a; });
         }
 
-        function obtenerUbicacionOriginal(activo) {
-            return activo['NOM UBICACION'] || activo['NOMUBICACION'] || activo['NOM UBICACIÓN'] || activo['NOM_UBICACION'] || '';
-        }
-        function obtenerEstadoOriginal(activo) {
-            return activo['OBSERV ESTADO'] || activo['OBSERVESTADO'] || activo['ESTADOAF'] || '';
+        // ===================== PROPIEDADES FIJAS (Android/iOS) =====================
+        function asegurarPropiedadesFijas(activo) {
+            if (!activo._ubicacionOriginal) activo._ubicacionOriginal = activo['NOM UBICACION'] || activo['NOMUBICACION'] || activo['NOM UBICACIÓN'] || activo['NOM_UBICACION'] || '';
+            if (!activo._responsableOriginal) activo._responsableOriginal = activo['NOM RESP ANT'] || activo['NOMRESPANT'] || '';
+            if (!activo._estadoOriginal) activo._estadoOriginal = activo['OBSERV ESTADO'] || activo['OBSERVESTADO'] || activo['ESTADOAF'] || '';
         }
 
         // ===================== IMPORTAR =====================
@@ -451,6 +467,7 @@
                     newRow._nuevoResponsable = newRow._nuevoResponsable || '';
                     newRow._nuevoEstado = newRow._nuevoEstado || '';
                     newRow._observaciones = newRow._observaciones || '';
+                    asegurarPropiedadesFijas(newRow);
                     return newRow;
                 });
                 reconstruirMapa();
@@ -536,6 +553,9 @@
                 _nuevoResponsable: resp,
                 _nuevoEstado: estado,
                 _observaciones: obs,
+                _ubicacionOriginal: '',
+                _responsableOriginal: '',
+                _estadoOriginal: estado,
                 _codigoAuto: codigo
             };
             activosDB.push(nuevoActivo);
@@ -548,9 +568,23 @@
         }
 
         // ===================== BÚSQUEDA Y NAVEGACIÓN =====================
+        function prepararBusqueda() {
+            // Limpiar resultado anterior, enfocar y poner "E"
+            limpiarBusqueda();
+            const input = document.getElementById('searchInput');
+            input.value = 'E';
+            input.focus();
+            // Mover cursor al final
+            input.setSelectionRange(1, 1);
+            // No buscar automáticamente; el usuario debe presionar Enter o el botón Buscar de nuevo
+        }
+
         function buscarActivo() {
             const codigo = document.getElementById('searchInput').value.trim();
             if (!codigo) return;
+            // Limpiar detalle previo
+            document.getElementById('assetDetail').classList.remove('active');
+            activoActual = null;
             const activo = activosMap[codigo];
             if (activo) { resultadosBusqueda = [activo]; indiceNavegacion = 0; mostrarActivo(activo); return; }
             const resultados = activosDB.filter(a => (a.CODIGOAF||'').toLowerCase().includes(codigo.toLowerCase()));
@@ -559,32 +593,38 @@
             else { mostrarToast('❌ No encontrado'); }
             document.getElementById('clearSearchBtn').style.display = 'inline-flex';
         }
+
         function limpiarBusqueda() {
             document.getElementById('searchInput').value = '';
             document.getElementById('assetDetail').classList.remove('active');
             activoActual = null; resultadosBusqueda = []; indiceNavegacion = -1;
             document.getElementById('clearSearchBtn').style.display = 'none';
         }
+
         function buscarPrimerPendiente() {
             const pendientes = activosDB.filter(a => a._estadoInventario === 'pendiente');
             if (!pendientes.length) { mostrarToast('🎉 Todos inventariados'); return; }
             resultadosBusqueda = pendientes; indiceNavegacion = 0; mostrarActivo(pendientes[0]);
             document.getElementById('clearSearchBtn').style.display = 'inline-flex';
         }
+
         function navegarActivo(dir) {
             if (!resultadosBusqueda.length) return;
             indiceNavegacion = (indiceNavegacion + dir + resultadosBusqueda.length) % resultadosBusqueda.length;
             mostrarActivo(resultadosBusqueda[indiceNavegacion]);
         }
+
         function mostrarActivo(activo) {
+            asegurarPropiedadesFijas(activo);   // por si acaso
             activoActual = activo;
             document.getElementById('assetDetail').classList.add('active');
             document.getElementById('assetCode').textContent = activo.CODIGOAF || '-';
             document.getElementById('assetNombre').textContent = activo.NOMBREAF || '-';
             document.getElementById('assetDescripcion').textContent = activo.DESCAF || '-';
-            document.getElementById('assetUbicacion').textContent = obtenerUbicacionOriginal(activo);
-            document.getElementById('assetResponsable').textContent = activo['NOM RESP ANT'] || '';
-            document.getElementById('assetEstadoOriginal').textContent = obtenerEstadoOriginal(activo);
+            // Usar propiedades fijas
+            document.getElementById('assetUbicacion').textContent = activo._ubicacionOriginal || '';
+            document.getElementById('assetResponsable').textContent = activo._responsableOriginal || '';
+            document.getElementById('assetEstadoOriginal').textContent = activo._estadoOriginal || '';
             const badge = document.getElementById('assetStatusBadge');
             badge.className = 'asset-status-badge';
             const est = activo._estadoInventario || 'pendiente';
@@ -620,6 +660,7 @@
             document.getElementById('searchInput').value = activo.CODIGOAF || '';
             document.getElementById('clearSearchBtn').style.display = 'inline-flex';
         }
+
         function actualizarSubUbicaciones() {
             const piso = document.getElementById('nuevoPiso').value;
             const sub = document.getElementById('nuevaSubUbicacion');
@@ -647,30 +688,32 @@
             const resp = obtenerResponsableFinal('nuevoResponsable', 'otroResponsable');
             const estadoSeleccionado = document.getElementById('nuevoEstado').value;
             const obs = document.getElementById('observaciones').value.trim();
-            const ubicacionOriginal = obtenerUbicacionOriginal(activoActual);
-            const estadoOriginal = obtenerEstadoOriginal(activoActual);
-            const tipo = (nuevaUb !== ubicacionOriginal || resp !== (activoActual['NOM RESP ANT']||'') || estadoSeleccionado !== '') ? 'con_cambio' : 'sin_cambio';
+            const ubicacionOriginal = activoActual._ubicacionOriginal || '';
+            const estadoOriginal = activoActual._estadoOriginal || '';
+            const tipo = (nuevaUb !== ubicacionOriginal || resp !== (activoActual._responsableOriginal||'') || estadoSeleccionado !== '') ? 'con_cambio' : 'sin_cambio';
             const estadoFinal = estadoSeleccionado || estadoOriginal;
             Object.assign(activoActual, {_estadoInventario: tipo, _nuevaUbicacion: nuevaUb, _nuevoResponsable: resp, _nuevoEstado: estadoFinal, _observaciones: obs});
-            const reg = {codigo: activoActual.CODIGOAF, nombre: activoActual.NOMBREAF, ubicacionOriginal, nuevaUbicacion: nuevaUb, responsableOriginal: activoActual['NOM RESP ANT']||'', nuevoResponsable: resp, estado: estadoFinal, tipo, observaciones: obs};
+            const reg = {codigo: activoActual.CODIGOAF, nombre: activoActual.NOMBREAF, ubicacionOriginal, nuevaUbicacion: nuevaUb, responsableOriginal: activoActual._responsableOriginal||'', nuevoResponsable: resp, estado: estadoFinal, tipo, observaciones: obs};
             const idx = historialInventario.findIndex(h => h.codigo === reg.codigo);
             if (idx>=0) historialInventario[idx] = reg; else historialInventario.push(reg);
             guardarEnLocalStorage(); actualizarDashboard(); actualizarTablaHistorial();
             mostrarToast('✅ Guardado');
             setTimeout(() => buscarPrimerPendiente(), 800);
         }
+
         function marcarSinCambios() {
             if (!activoActual) return;
-            const ubicacionOriginal = obtenerUbicacionOriginal(activoActual);
-            const estadoOriginal = obtenerEstadoOriginal(activoActual);
-            Object.assign(activoActual, {_estadoInventario:'sin_cambio', _nuevaUbicacion: ubicacionOriginal, _nuevoResponsable: activoActual['NOM RESP ANT']||'', _nuevoEstado: estadoOriginal, _observaciones:''});
-            const reg = {codigo: activoActual.CODIGOAF, nombre: activoActual.NOMBREAF, ubicacionOriginal, nuevaUbicacion: ubicacionOriginal, responsableOriginal: activoActual['NOM RESP ANT']||'', nuevoResponsable: activoActual['NOM RESP ANT']||'', estado: estadoOriginal, tipo:'sin_cambio', observaciones:''};
+            const ubicacionOriginal = activoActual._ubicacionOriginal || '';
+            const estadoOriginal = activoActual._estadoOriginal || '';
+            Object.assign(activoActual, {_estadoInventario:'sin_cambio', _nuevaUbicacion: ubicacionOriginal, _nuevoResponsable: activoActual._responsableOriginal||'', _nuevoEstado: estadoOriginal, _observaciones:''});
+            const reg = {codigo: activoActual.CODIGOAF, nombre: activoActual.NOMBREAF, ubicacionOriginal, nuevaUbicacion: ubicacionOriginal, responsableOriginal: activoActual._responsableOriginal||'', nuevoResponsable: activoActual._responsableOriginal||'', estado: estadoOriginal, tipo:'sin_cambio', observaciones:''};
             const idx = historialInventario.findIndex(h => h.codigo === reg.codigo);
             if (idx>=0) historialInventario[idx] = reg; else historialInventario.push(reg);
             guardarEnLocalStorage(); actualizarDashboard(); actualizarTablaHistorial();
             mostrarToast('✅ Sin cambios');
             setTimeout(() => buscarPrimerPendiente(), 800);
         }
+
         function limpiarFormulario() {
             document.getElementById('nuevoPiso').value='';
             actualizarSubUbicaciones();
@@ -716,8 +759,8 @@
         function cambiarFiltroPiso() {
             const sel = document.getElementById('filtroPisoSelect');
             filtroPiso = sel.value || null;
-            actualizarSelectUbicaciones();  // actualiza el select de ubicaciones según el piso
-            document.getElementById('filtroUbicacionSelect').value = ''; // resetea ubicación
+            actualizarSelectUbicaciones();
+            document.getElementById('filtroUbicacionSelect').value = '';
             filtroUbicacion = null;
             actualizarTablaHistorial();
         }
@@ -728,6 +771,12 @@
             actualizarTablaHistorial();
         }
 
+        function cambiarFiltroResponsable() {
+            const sel = document.getElementById('filtroResponsableSelect');
+            filtroResponsable = sel.value || null;
+            actualizarTablaHistorial();
+        }
+
         function actualizarSelectUbicaciones() {
             const selUbicacion = document.getElementById('filtroUbicacionSelect');
             selUbicacion.innerHTML = '<option value="">📍 Todas las ubicaciones</option>';
@@ -735,21 +784,28 @@
             if (pisoSeleccionado && UBICACIONES_POR_PISO[pisoSeleccionado]) {
                 UBICACIONES_POR_PISO[pisoSeleccionado].forEach(u => {
                     const opt = document.createElement('option');
-                    opt.value = u;
-                    opt.textContent = u;
+                    opt.value = u; opt.textContent = u;
                     selUbicacion.appendChild(opt);
                 });
             } else {
-                // si no hay piso seleccionado, mostrar todas las ubicaciones de todos los pisos
                 for (let piso in UBICACIONES_POR_PISO) {
                     UBICACIONES_POR_PISO[piso].forEach(u => {
                         const opt = document.createElement('option');
-                        opt.value = u;
-                        opt.textContent = u;
+                        opt.value = u; opt.textContent = u;
                         selUbicacion.appendChild(opt);
                     });
                 }
             }
+        }
+
+        function actualizarSelectResponsables() {
+            const selResp = document.getElementById('filtroResponsableSelect');
+            selResp.innerHTML = '<option value="">👤 Todos los responsables</option>';
+            LISTA_RESPONSABLES.forEach(nombre => {
+                const opt = document.createElement('option');
+                opt.value = nombre; opt.textContent = nombre;
+                selResp.appendChild(opt);
+            });
         }
 
         function filtrarTabla() { actualizarTablaHistorial(); }
@@ -758,16 +814,20 @@
             const tbody = document.getElementById('historyTableBody');
             const texto = (document.getElementById('filterTable')?.value || '').toLowerCase();
             let datos = [...historialInventario];
+            // Agregar pendientes sin registro
             activosDB.filter(a => a._estadoInventario === 'pendiente' && !datos.some(h => h.codigo === a.CODIGOAF))
-                .forEach(a => datos.push({ codigo: a.CODIGOAF, nombre: a.NOMBREAF, ubicacionOriginal: obtenerUbicacionOriginal(a), nuevaUbicacion: '', nuevoResponsable: '', estado: obtenerEstadoOriginal(a), tipo: 'pendiente', observaciones: '' }));
+                .forEach(a => datos.push({ codigo: a.CODIGOAF, nombre: a.NOMBREAF, ubicacionOriginal: a._ubicacionOriginal||'', nuevaUbicacion: '', nuevoResponsable: '', estado: a._estadoOriginal||'', tipo: 'pendiente', observaciones: '' }));
+            // Agregar nuevos sin registro
             activosDB.filter(a => a._estadoInventario === 'nuevo' && !datos.some(h => h.codigo === a.CODIGOAF))
-                .forEach(a => datos.push({ codigo: a.CODIGOAF, nombre: a.NOMBREAF || '(Nuevo)', ubicacionOriginal: '', nuevaUbicacion: a._nuevaUbicacion, nuevoResponsable: a._nuevoResponsable, estado: a._nuevoEstado || '', tipo: 'nuevo', observaciones: a._observaciones }));
+                .forEach(a => datos.push({ codigo: a.CODIGOAF, nombre: a.NOMBREAF || '(Nuevo)', ubicacionOriginal: '', nuevaUbicacion: a._nuevaUbicacion, nuevoResponsable: a._nuevoResponsable, estado: a._nuevoEstado||'', tipo: 'nuevo', observaciones: a._observaciones }));
 
+            // Aplicar filtro de estado
             if (filtroEstado === null) {
                 datos = datos.filter(h => h.tipo === 'sin_cambio' || h.tipo === 'con_cambio');
             } else if (filtroEstado !== 'todos') {
                 datos = datos.filter(h => h.tipo === filtroEstado);
             }
+            // Filtro de piso
             if (filtroPiso) {
                 datos = datos.filter(h => {
                     if (h.tipo === 'pendiente') return UBICACIONES_POR_PISO[filtroPiso].some(u => h.ubicacionOriginal.includes(u));
@@ -775,6 +835,7 @@
                     else return h.nuevaUbicacion && UBICACIONES_POR_PISO[filtroPiso].includes(h.nuevaUbicacion);
                 });
             }
+            // Filtro de ubicación específica
             if (filtroUbicacion) {
                 datos = datos.filter(h => {
                     if (h.tipo === 'pendiente') return h.ubicacionOriginal === filtroUbicacion;
@@ -782,7 +843,15 @@
                     else return h.nuevaUbicacion === filtroUbicacion || h.ubicacionOriginal === filtroUbicacion;
                 });
             }
+            // Filtro por responsable (original o nuevo)
+            if (filtroResponsable) {
+                datos = datos.filter(h => {
+                    return h.nuevoResponsable === filtroResponsable || h.responsableOriginal === filtroResponsable;
+                });
+            }
+            // Filtro de texto
             if (texto) datos = datos.filter(h => (h.codigo||'').toLowerCase().includes(texto) || (h.nombre||'').toLowerCase().includes(texto));
+
             if (!datos.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty-state">📭 Sin registros</td></tr>'; return; }
             tbody.innerHTML = datos.map(h => `
                 <tr class="${h.tipo==='con_cambio'?'con-cambio': (h.tipo==='pendiente'?'pendiente': (h.tipo==='nuevo'?'nuevo':'inventariado'))}">
@@ -846,7 +915,7 @@
             }
         }
 
-        // ===================== EXPORTAR / GUARDAR (con historial incluido) =====================
+        // ===================== EXPORTAR / GUARDAR =====================
         function descargarXLSX(wb, nombreArchivo) {
             const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
             const blob = new Blob([wbout], { type: 'application/octet-stream' });
@@ -865,12 +934,12 @@
             const nuevosActivos = activosDB.filter(a => a._estadoInventario === 'nuevo');
             const hojaInventario = activosInventario.map(a => ({
                 CODIGOAF: a.CODIGOAF, NOMBREAF: a.NOMBREAF, DESCAF: a.DESCAF,
-                'UBICACION ORIGINAL': obtenerUbicacionOriginal(a),
-                'RESPONSABLE ORIGINAL': a['NOM RESP ANT'] || '',
-                'ESTADO ORIGINAL': obtenerEstadoOriginal(a),
+                'UBICACION ORIGINAL': a._ubicacionOriginal || '',
+                'RESPONSABLE ORIGINAL': a._responsableOriginal || '',
+                'ESTADO ORIGINAL': a._estadoOriginal || '',
                 'NUEVA UBICACION': a._estadoInventario === 'pendiente' ? '' : a._nuevaUbicacion,
                 'NUEVO RESPONSABLE': a._estadoInventario === 'pendiente' ? '' : a._nuevoResponsable,
-                'NUEVO ESTADO': a._estadoInventario === 'pendiente' ? '' : (a._nuevoEstado || obtenerEstadoOriginal(a)),
+                'NUEVO ESTADO': a._estadoInventario === 'pendiente' ? '' : (a._nuevoEstado || a._estadoOriginal || ''),
                 OBSERVACIONES: a._estadoInventario === 'pendiente' ? '' : a._observaciones,
                 'ESTADO INVENTARIO': a._estadoInventario
             }));
@@ -885,7 +954,6 @@
                 OBSERVACIONES: a._observaciones,
                 'ESTADO INVENTARIO': 'nuevo'
             }));
-            // Hoja de historial
             const hojaHistorial = historialInventario.map(h => ({
                 CODIGOAF: h.codigo,
                 NOMBREAF: h.nombre || '',
@@ -914,38 +982,43 @@
             reader.onload = function(e) {
                 const data = new Uint8Array(e.target.result);
                 const wb = XLSX.read(data, {type:'array'});
-                // Cargar hoja de inventario (primera hoja)
+                // Cargar hoja de inventario
                 if (wb.SheetNames.length > 0) {
                     const sheetInv = wb.Sheets[wb.SheetNames[0]];
                     const jsonInv = XLSX.utils.sheet_to_json(sheetInv, {defval:''});
                     if (jsonInv.length) {
-                        activosDB = jsonInv.map(a => ({
-                            ...a,
-                            _estadoInventario: a['ESTADO INVENTARIO'] || 'pendiente',
-                            _nuevaUbicacion: a['NUEVA UBICACION'] || '',
-                            _nuevoResponsable: a['NUEVO RESPONSABLE'] || '',
-                            _nuevoEstado: a['NUEVO ESTADO'] || '',
-                            _observaciones: a.OBSERVACIONES || ''
-                        }));
-                        // Si hay hoja de nuevos, agregarlos
+                        activosDB = jsonInv.map(a => {
+                            const newA = { ...a,
+                                _estadoInventario: a['ESTADO INVENTARIO'] || 'pendiente',
+                                _nuevaUbicacion: a['NUEVA UBICACION'] || '',
+                                _nuevoResponsable: a['NUEVO RESPONSABLE'] || '',
+                                _nuevoEstado: a['NUEVO ESTADO'] || '',
+                                _observaciones: a.OBSERVACIONES || ''
+                            };
+                            asegurarPropiedadesFijas(newA);
+                            return newA;
+                        });
+                        // Nuevos
                         const hojaNuevos = wb.Sheets['Nuevos Activos'];
                         if (hojaNuevos) {
                             const jsonNuevos = XLSX.utils.sheet_to_json(hojaNuevos, {defval:''});
                             jsonNuevos.forEach(a => {
-                                activosDB.push({
+                                const nuevo = {
                                     ...a,
                                     _estadoInventario: 'nuevo',
                                     _nuevaUbicacion: a['NUEVA UBICACION'] || '',
                                     _nuevoResponsable: a['NUEVO RESPONSABLE'] || '',
                                     _nuevoEstado: a['NUEVO ESTADO'] || '',
                                     _observaciones: a.OBSERVACIONES || ''
-                                });
+                                };
+                                asegurarPropiedadesFijas(nuevo);
+                                activosDB.push(nuevo);
                             });
                         }
                         reconstruirMapa();
                     }
                 }
-                // Cargar hoja de historial si existe
+                // Cargar historial
                 const hojaHist = wb.Sheets['Historial'];
                 if (hojaHist) {
                     const jsonHist = XLSX.utils.sheet_to_json(hojaHist, {defval:''});
