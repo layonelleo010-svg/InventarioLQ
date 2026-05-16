@@ -50,7 +50,6 @@
         .quick-filters { display: flex; gap: 0.3rem; margin-top: 0.6rem; flex-wrap: wrap; align-items: center; }
         .filter-chip { padding: 0.25rem 0.7rem; border-radius: 20px; font-size: 0.65rem; cursor: pointer; border: 1.5px solid var(--border); background: white; font-weight: 500; transition: 0.2s; }
         .filter-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
-        .filter-select { padding: 0.25rem 0.5rem; border-radius: 20px; font-size: 0.65rem; border: 1.5px solid var(--border); background: white; font-weight: 500; color: var(--text); }
         .asset-detail { background: var(--card); border-radius: var(--radius); padding: 0.8rem; box-shadow: var(--shadow); margin-bottom: 0.75rem; display: none; }
         .asset-detail.active { display: block; }
         .asset-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.6rem; padding-bottom: 0.6rem; border-bottom: 2px solid var(--border); }
@@ -65,6 +64,18 @@
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.6rem; }
         .form-group label { font-weight: 600; font-size: 0.7rem; margin-bottom: 0.15rem; display: block; }
         .form-group select, .form-group input, .form-group textarea { padding: 0.5rem; border: 2px solid var(--border); border-radius: 8px; font-size: 0.8rem; width: 100%; background: white; }
+        .select-wrapper { position: relative; display: flex; align-items: center; }
+        .select-wrapper::after {
+            content: '▼';
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+        .select-wrapper input { padding-right: 2rem; }
         .form-actions { display: flex; gap: 0.4rem; margin-top: 0.8rem; flex-wrap: wrap; }
         .form-actions .btn { pointer-events: auto; }
         .history-section { background: var(--card); border-radius: var(--radius); padding: 0.8rem; box-shadow: var(--shadow); }
@@ -104,7 +115,6 @@
             .dashboard { grid-template-columns: repeat(2, 1fr); }
             .search-row { flex-direction: column; align-items: stretch; } .search-input-group { width: 100%; }
             .asset-info-grid { grid-template-columns: 1fr; } .form-grid { grid-template-columns: 1fr; }
-            .quick-filters { flex-direction: column; align-items: flex-start; }
         }
     </style>
 </head>
@@ -158,28 +168,9 @@
                 </div>
                 <div class="form-group">
                     <label>Nuevo Responsable</label>
-                    <select id="newNuevoResponsable" onchange="toggleOtroCampo('newNuevoResponsable','newOtroResponsable')">
-                        <option value="">Seleccionar...</option>
-                        <optgroup label="Personal">
-                            <option>Liz Aliaga</option><option>Sol Alipaz</option><option>Tatiana Aenitez</option>
-                            <option>Boris Aranisa</option><option>Luisa Canaviri</option><option>Manuel Chavez</option>
-                            <option>Fernando Fernandez</option><option>Yolanda Flores</option><option>Marianne Gassenmeier</option>
-                            <option>Armando Gonzales</option><option>Maks Gutierrez</option><option>Rosario Hinojosa</option>
-                            <option>Lourdes Ibañez</option><option>Sara Lozano</option><option>Jose Marca</option>
-                            <option>Abril Mercado</option><option>Carmen Pacheco</option><option>Lourdes Quispe</option>
-                            <option>Said Ramirez</option><option>Marcela Raya</option><option>Fortunato Tarqui</option>
-                            <option>Yessica Tarquino</option><option>Gabriela Torrez</option><option>Jorge Vasquez</option>
-                            <option>Ronald Vidaurre</option><option>Rene Barcena</option><option>Adriana Gomez</option>
-                            <option>Maria Jagatheswaran</option><option>Ricardo Alvarez</option><option>Enrique Ayo</option>
-                            <option>Guillermo Beltran</option><option>Luis Daza</option><option>Alberto Gozalves</option>
-                            <option>Andres Guzman</option><option>Osvaldo Irusta</option><option>Mauricio Maldonado</option>
-                            <option>Claudia Oporto</option><option>Mario Patiño</option><option>Jamil Rodas</option>
-                            <option>Jorge Rodriguez</option><option>Martin Salinas</option><option>Leonardo Taborga</option>
-                            <option>Leonel Quispe</option><option>Milton Rios</option>
-                        </optgroup>
-                        <option value="__otro__">– Otro –</option>
-                    </select>
-                    <input type="text" id="newOtroResponsable" placeholder="Escriba el nombre" style="display:none; margin-top:0.3rem;">
+                    <div class="select-wrapper">
+                        <input type="text" id="newNuevoResponsable" list="listaResponsables" placeholder="Escriba o seleccione..." autocomplete="off">
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Nuevo Estado</label>
@@ -218,8 +209,8 @@
         <div class="search-section">
             <div class="search-row">
                 <div class="search-input-group">
-                    <input type="text" class="search-input" id="searchInput" placeholder="🔍 Ej: E72" onkeyup="if(event.key==='Enter') buscarActivo()" inputmode="numeric" pattern="[0-9]*">
-                    <button class="search-btn" onclick="prepararBusqueda()">Buscar</button>
+                    <input type="text" class="search-input" id="searchInput" placeholder="🔍 Código de activo..." onkeyup="if(event.key==='Enter') buscarActivo()">
+                    <button class="search-btn" onclick="buscarActivo()">Buscar</button>
                 </div>
                 <button class="clear-search-btn" id="clearSearchBtn" onclick="limpiarBusqueda()">✖️</button>
                 <button class="scan-btn" id="scanBtn" onclick="toggleScanner()">📷</button>
@@ -233,16 +224,11 @@
                 <span class="filter-chip" data-filter="sin_cambio" onclick="toggleStateFilter('sin_cambio', this)">✅ Sin cambios</span>
                 <span class="filter-chip" data-filter="con_cambio" onclick="toggleStateFilter('con_cambio', this)">🔄 Con cambios</span>
                 <span class="filter-chip" data-filter="nuevo" onclick="toggleStateFilter('nuevo', this)">🆕 Nuevos</span>
-                <select id="filtroPisoSelect" class="filter-select" onchange="cambiarFiltroPiso()">
-                    <option value="">🏢 Todos los pisos</option>
-                    <option value="PB">PB</option><option value="P1">P1</option><option value="P2">P2</option><option value="P3">P3</option><option value="Terraza">Terraza</option>
-                </select>
-                <select id="filtroUbicacionSelect" class="filter-select" onchange="cambiarFiltroUbicacion()">
-                    <option value="">📍 Todas las ubicaciones</option>
-                </select>
-                <select id="filtroResponsableSelect" class="filter-select" onchange="cambiarFiltroResponsable()">
-                    <option value="">👤 Todos los responsables</option>
-                </select>
+                <span class="filter-chip" data-filter="PB" onclick="togglePisoFilter('PB', this)">🏢 PB</span>
+                <span class="filter-chip" data-filter="P1" onclick="togglePisoFilter('P1', this)">🏢 P1</span>
+                <span class="filter-chip" data-filter="P2" onclick="togglePisoFilter('P2', this)">🏢 P2</span>
+                <span class="filter-chip" data-filter="P3" onclick="togglePisoFilter('P3', this)">🏢 P3</span>
+                <span class="filter-chip" data-filter="Terraza" onclick="togglePisoFilter('Terraza', this)">🌅 Terraza</span>
             </div>
         </div>
 
@@ -282,28 +268,9 @@
                     </div>
                     <div class="form-group">
                         <label>Nuevo Responsable</label>
-                        <select id="nuevoResponsable" onchange="toggleOtroCampo('nuevoResponsable','otroResponsable')">
-                            <option value="">Seleccionar...</option>
-                            <optgroup label="Personal">
-                                <option>Liz Aliaga</option><option>Sol Alipaz</option><option>Tatiana Aenitez</option>
-                                <option>Boris Aranisa</option><option>Luisa Canaviri</option><option>Manuel Chavez</option>
-                                <option>Fernando Fernandez</option><option>Yolanda Flores</option><option>Marianne Gassenmeier</option>
-                                <option>Armando Gonzales</option><option>Maks Gutierrez</option><option>Rosario Hinojosa</option>
-                                <option>Lourdes Ibañez</option><option>Sara Lozano</option><option>Jose Marca</option>
-                                <option>Abril Mercado</option><option>Carmen Pacheco</option><option>Lourdes Quispe</option>
-                                <option>Said Ramirez</option><option>Marcela Raya</option><option>Fortunato Tarqui</option>
-                                <option>Yessica Tarquino</option><option>Gabriela Torrez</option><option>Jorge Vasquez</option>
-                                <option>Ronald Vidaurre</option><option>Rene Barcena</option><option>Adriana Gomez</option>
-                                <option>Maria Jagatheswaran</option><option>Ricardo Alvarez</option><option>Enrique Ayo</option>
-                                <option>Guillermo Beltran</option><option>Luis Daza</option><option>Alberto Gozalves</option>
-                                <option>Andres Guzman</option><option>Osvaldo Irusta</option><option>Mauricio Maldonado</option>
-                                <option>Claudia Oporto</option><option>Mario Patiño</option><option>Jamil Rodas</option>
-                                <option>Jorge Rodriguez</option><option>Martin Salinas</option><option>Leonardo Taborga</option>
-                                <option>Leonel Quispe</option><option>Milton Rios</option>
-                            </optgroup>
-                            <option value="__otro__">– Otro –</option>
-                        </select>
-                        <input type="text" id="otroResponsable" placeholder="Escriba el nombre" style="display:none; margin-top:0.3rem;">
+                        <div class="select-wrapper">
+                            <input type="text" id="nuevoResponsable" list="listaResponsables" placeholder="Escriba o seleccione..." autocomplete="off">
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Nuevo Estado</label>
@@ -352,27 +319,35 @@
     <input type="file" id="fileInputXlsx" class="hidden-input" accept=".xlsx,.xls" onchange="importarArchivo(event)">
     <input type="file" id="loadProgressInputXlsx" class="hidden-input" accept=".xlsx,.xls" onchange="cargarProgresoXLSX(event)">
     
+    <!-- Lista compartida de responsables para el datalist -->
+    <datalist id="listaResponsables">
+        <option>Liz Aliaga</option><option>Sol Alipaz</option><option>Tatiana Aenitez</option>
+        <option>Boris Aranisa</option><option>Luisa Canaviri</option><option>Manuel Chavez</option>
+        <option>Fernando Fernandez</option><option>Yolanda Flores</option><option>Marianne Gassenmeier</option>
+        <option>Armando Gonzales</option><option>Maks Gutierrez</option><option>Rosario Hinojosa</option>
+        <option>Lourdes Ibañez</option><option>Sara Lozano</option><option>Jose Marca</option>
+        <option>Abril Mercado</option><option>Carmen Pacheco</option><option>Lourdes Quispe</option>
+        <option>Said Ramirez</option><option>Marcela Raya</option><option>Fortunato Tarqui</option>
+        <option>Yessica Tarquino</option><option>Gabriela Torrez</option><option>Jorge Vasquez</option>
+        <option>Ronald Vidaurre</option><option>Rene Barcena</option><option>Adriana Gomez</option>
+        <option>Maria Jagatheswaran</option><option>Ricardo Alvarez</option><option>Enrique Ayo</option>
+        <option>Guillermo Beltran</option><option>Luis Daza</option><option>Alberto Gozalves</option>
+        <option>Andres Guzman</option><option>Osvaldo Irusta</option><option>Mauricio Maldonado</option>
+        <option>Claudia Oporto</option><option>Mario Patiño</option><option>Jamil Rodas</option>
+        <option>Jorge Rodriguez</option><option>Martin Salinas</option><option>Leonardo Taborga</option>
+        <option>Leonel Quispe</option><option>Milton Rios</option>
+    </datalist>
+
     <div id="toastContainer"></div>
 
     <script>
         const UBICACIONES_POR_PISO = {
             'PB': ['AULA PLANA - PB','ADMISIONES - PB','DEP. CENTRO DE CÓMPUTO - PB','PASILLO - PB','RECEPCION - PB','ARCHIVO GENERAL - PB','DEPÓSITO - PB','ALMACEN MATERIALES - PB','DEPÓSITO MENSAJERIA - PB','BAÑO DE HOMBRES - PB','BAÑO DE MUJERES - PB'],
             'P1': ['ARCHIVO CONTABILIDAD - P1','COWORK EPC-UCB - P1','SALA DE ESTUDIO 1 - P1','SALA DE ESTUDIO 2 - P1','SALA DE ESTUDIO 4 - P1','SALA DE ESTUDIO - P1','PASILLO - P1','AULA 1 - P1','AULA 2 - P1','SALA DE PROFESORES - P1','BAÑO DE HOMBRES - P1','BAÑO DE MUJERES - P1','BAÑO PARA PERSONAS CON CAPACIDADES DIFERENTES - P1'],
-            'P2': ['OF. PROFESOR T.C. 4 - P2','DIR. G.P.P. - P2','ASISTENCIA ADM POSGRADO - P2','DIR. EPC - P2','OF. CENTRO DE COMPUTO - P2','CONTABILIDAD - P2','PLATAFORMA VIRTUAL - P2','SALA DE SERVIDORES - P2','TESORERÍA - P2','CAJA - P2','KARDEX Y REGISTRO - P2','ASISTENTES 2 - P2','STRIA. ACADEMICA - P2','AULA CENTRO DE CÓMPUTO - P2','DIR. MFE - P2','OF. PROFESOR T.C. 1 - P2','OF. PROFESOR T.C. 2 - P2','OF. PROFESOR T.C. 3 - P2','PASILLO - P2','ARCHIVO DE KARDEX - P2','ASISTENTES 1 - P2','DIR. ADMINISTRATIVA - P2','SALA DE REUNIONES - P2','AULA 3 - P2','COCINETA - P2','BAÑO DE HOMBRES - P2','BAÑO DE MUJERES - P2'],
+            'P2': ['OF. PROFESOR T.C. 4 - P2','DIR. G.P.P. - P2','ASISTENCIA ADM POSGRADO - P2','DIR. EPC - P2','OF. CENTRO DE COMPUTO - P2','CONTABILIDAD - P2','PLATAFORMA VIRTUAL - P2','SALA DE SERVIDORES - P2','TESORERÍA - P2','CAJA - P2','KARDEX Y REGISTRO - P2','ASISTENTES 2 - P2','STRIA. ACADEMICA - P2','AULA CENTRO DE CÓMPUTO - P2','DIR. MFE - P2','OF. PROFESOR T.C. 1 - P2','OF. PROFESOR T.C. 2 - P2','OF. PROFESOR T.C. 3 - P2','PASILLO - P2','ARCHIVO DE KARDEX - P2','ASISTENTES 1 - P2','DIR. ADMINISTRATIVA - P2','SALA DE REUNIONES - P2','AULA 3 - P2','COCINETA - P2'],
             'P3': ['DEP. 4 - P3','AULA P- P3','AULA 4 - P3','AULA 5 - P3','SALA DE ESTUDIO 5 - P3','SALA DE ESTUDIO 6 - P3','SALA DE ESTUDIO 7 - P3','SALA DE ESTUDIO 8 - P3','SALA DE ESTUDIO 9 - P3','SALA DE ESTUDIO 10 - P3','SALA DE ESTUDIO 11 - P3','PASILLO - P3','AULA MAGNA - P3','BAÑO DE HOMBRES - P3','BAÑO DE MUJERES - P3'],
             'Terraza': ['TERRAZA']
         };
-
-        const LISTA_RESPONSABLES = [
-            "Liz Aliaga","Sol Alipaz","Tatiana Aenitez","Boris Aranisa","Luisa Canaviri","Manuel Chavez",
-            "Fernando Fernandez","Yolanda Flores","Marianne Gassenmeier","Armando Gonzales","Maks Gutierrez",
-            "Rosario Hinojosa","Lourdes Ibañez","Sara Lozano","Jose Marca","Abril Mercado","Carmen Pacheco",
-            "Lourdes Quispe","Said Ramirez","Marcela Raya","Fortunato Tarqui","Yessica Tarquino","Gabriela Torrez",
-            "Jorge Vasquez","Ronald Vidaurre","Rene Barcena","Adriana Gomez","Maria Jagatheswaran","Ricardo Alvarez",
-            "Enrique Ayo","Guillermo Beltran","Luis Daza","Alberto Gozalves","Andres Guzman","Osvaldo Irusta",
-            "Mauricio Maldonado","Claudia Oporto","Mario Patiño","Jamil Rodas","Jorge Rodriguez","Martin Salinas",
-            "Leonardo Taborga","Leonel Quispe","Milton Rios"
-        ];
 
         let activosDB = [];
         let activosMap = {};
@@ -382,8 +357,6 @@
         let indiceNavegacion = -1;
         let filtroEstado = null;           
         let filtroPiso = null;
-        let filtroUbicacion = null;
-        let filtroResponsable = null;   // nuevo filtro por responsable
         let html5QrScanner = null;
         let escaneando = false;
         let intervaloExportacion = null;
@@ -393,8 +366,7 @@
             cargarEstadoGuardado();
             actualizarDashboard();
             actualizarTablaHistorial();
-            actualizarSelectUbicaciones();
-            actualizarSelectResponsables();   // poblar el select de responsables
+            // Barra inferior siempre visible, no es necesario cambiar nada en resize
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
                     navigator.serviceWorker.register('data:application/javascript;base64,' + btoa(
@@ -436,11 +408,11 @@
             activosDB.forEach(a => { const cod = (a.CODIGOAF||'').trim(); if(cod) activosMap[cod] = a; });
         }
 
-        // ===================== PROPIEDADES FIJAS (Android/iOS) =====================
-        function asegurarPropiedadesFijas(activo) {
-            if (!activo._ubicacionOriginal) activo._ubicacionOriginal = activo['NOM UBICACION'] || activo['NOMUBICACION'] || activo['NOM UBICACIÓN'] || activo['NOM_UBICACION'] || '';
-            if (!activo._responsableOriginal) activo._responsableOriginal = activo['NOM RESP ANT'] || activo['NOMRESPANT'] || '';
-            if (!activo._estadoOriginal) activo._estadoOriginal = activo['OBSERV ESTADO'] || activo['OBSERVESTADO'] || activo['ESTADOAF'] || '';
+        function obtenerUbicacionOriginal(activo) {
+            return activo['NOM UBICACION'] || activo['NOMUBICACION'] || activo['NOM UBICACIÓN'] || activo['NOM_UBICACION'] || '';
+        }
+        function obtenerEstadoOriginal(activo) {
+            return activo['OBSERV ESTADO'] || activo['OBSERVESTADO'] || activo['ESTADOAF'] || '';
         }
 
         // ===================== IMPORTAR =====================
@@ -467,7 +439,6 @@
                     newRow._nuevoResponsable = newRow._nuevoResponsable || '';
                     newRow._nuevoEstado = newRow._nuevoEstado || '';
                     newRow._observaciones = newRow._observaciones || '';
-                    asegurarPropiedadesFijas(newRow);
                     return newRow;
                 });
                 reconstruirMapa();
@@ -479,7 +450,7 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // ===================== ESCÁNER =====================
+        // ===================== ESCÁNER (pantalla completa sin bordes) =====================
         function obtenerDimensionesQrBox() {
             return { width: window.innerWidth, height: window.innerHeight };
         }
@@ -516,7 +487,6 @@
             document.getElementById('newNuevoPiso').value = '';
             actualizarSubUbicaciones_New();
             document.getElementById('newNuevoResponsable').value = '';
-            document.getElementById('newOtroResponsable').style.display = 'none';
             document.getElementById('newNuevoEstado').value = '';
             document.getElementById('newObservaciones').value = '';
         }
@@ -535,9 +505,7 @@
             const sub = document.getElementById('newNuevaSubUbicacion').value;
             if (!piso || !sub) { mostrarToast('Seleccione piso y ubicación', 'error'); return; }
             const codigo = document.getElementById('newCodigo').value.trim() || ('NUEVO-' + Date.now());
-            const respSelect = document.getElementById('newNuevoResponsable').value;
-            const respOtro = document.getElementById('newOtroResponsable').value.trim();
-            const resp = (respSelect === '__otro__') ? respOtro : respSelect;
+            const resp = document.getElementById('newNuevoResponsable').value.trim();
             const estado = document.getElementById('newNuevoEstado').value;
             const obs = document.getElementById('newObservaciones').value.trim();
             const nuevoActivo = {
@@ -553,9 +521,6 @@
                 _nuevoResponsable: resp,
                 _nuevoEstado: estado,
                 _observaciones: obs,
-                _ubicacionOriginal: '',
-                _responsableOriginal: '',
-                _estadoOriginal: estado,
                 _codigoAuto: codigo
             };
             activosDB.push(nuevoActivo);
@@ -568,23 +533,9 @@
         }
 
         // ===================== BÚSQUEDA Y NAVEGACIÓN =====================
-        function prepararBusqueda() {
-            // Limpiar resultado anterior, enfocar y poner "E"
-            limpiarBusqueda();
-            const input = document.getElementById('searchInput');
-            input.value = 'E';
-            input.focus();
-            // Mover cursor al final
-            input.setSelectionRange(1, 1);
-            // No buscar automáticamente; el usuario debe presionar Enter o el botón Buscar de nuevo
-        }
-
         function buscarActivo() {
             const codigo = document.getElementById('searchInput').value.trim();
             if (!codigo) return;
-            // Limpiar detalle previo
-            document.getElementById('assetDetail').classList.remove('active');
-            activoActual = null;
             const activo = activosMap[codigo];
             if (activo) { resultadosBusqueda = [activo]; indiceNavegacion = 0; mostrarActivo(activo); return; }
             const resultados = activosDB.filter(a => (a.CODIGOAF||'').toLowerCase().includes(codigo.toLowerCase()));
@@ -593,38 +544,32 @@
             else { mostrarToast('❌ No encontrado'); }
             document.getElementById('clearSearchBtn').style.display = 'inline-flex';
         }
-
         function limpiarBusqueda() {
             document.getElementById('searchInput').value = '';
             document.getElementById('assetDetail').classList.remove('active');
             activoActual = null; resultadosBusqueda = []; indiceNavegacion = -1;
             document.getElementById('clearSearchBtn').style.display = 'none';
         }
-
         function buscarPrimerPendiente() {
             const pendientes = activosDB.filter(a => a._estadoInventario === 'pendiente');
             if (!pendientes.length) { mostrarToast('🎉 Todos inventariados'); return; }
             resultadosBusqueda = pendientes; indiceNavegacion = 0; mostrarActivo(pendientes[0]);
             document.getElementById('clearSearchBtn').style.display = 'inline-flex';
         }
-
         function navegarActivo(dir) {
             if (!resultadosBusqueda.length) return;
             indiceNavegacion = (indiceNavegacion + dir + resultadosBusqueda.length) % resultadosBusqueda.length;
             mostrarActivo(resultadosBusqueda[indiceNavegacion]);
         }
-
         function mostrarActivo(activo) {
-            asegurarPropiedadesFijas(activo);   // por si acaso
             activoActual = activo;
             document.getElementById('assetDetail').classList.add('active');
             document.getElementById('assetCode').textContent = activo.CODIGOAF || '-';
             document.getElementById('assetNombre').textContent = activo.NOMBREAF || '-';
             document.getElementById('assetDescripcion').textContent = activo.DESCAF || '-';
-            // Usar propiedades fijas
-            document.getElementById('assetUbicacion').textContent = activo._ubicacionOriginal || '';
-            document.getElementById('assetResponsable').textContent = activo._responsableOriginal || '';
-            document.getElementById('assetEstadoOriginal').textContent = activo._estadoOriginal || '';
+            document.getElementById('assetUbicacion').textContent = obtenerUbicacionOriginal(activo);
+            document.getElementById('assetResponsable').textContent = activo['NOM RESP ANT'] || '';
+            document.getElementById('assetEstadoOriginal').textContent = obtenerEstadoOriginal(activo);
             const badge = document.getElementById('assetStatusBadge');
             badge.className = 'asset-status-badge';
             const est = activo._estadoInventario || 'pendiente';
@@ -633,22 +578,7 @@
             else if (est === 'nuevo') { badge.classList.add('badge-nuevo'); badge.textContent = '🆕 NUEVO'; }
             else { badge.classList.add('badge-pendiente'); badge.textContent = '⏳ PENDIENTE'; }
             document.getElementById('navInfo').textContent = resultadosBusqueda.length > 1 ? `${indiceNavegacion+1}/${resultadosBusqueda.length}` : '';
-            // Cargar responsable en el select
-            const respSelect = document.getElementById('nuevoResponsable');
-            const respOtro = document.getElementById('otroResponsable');
-            const respGuardado = activo._nuevoResponsable || '';
-            const listaResponsables = Array.from(respSelect.options).map(o => o.value);
-            if (listaResponsables.includes(respGuardado)) {
-                respSelect.value = respGuardado;
-                respOtro.style.display = 'none';
-            } else if (respGuardado) {
-                respSelect.value = '__otro__';
-                respOtro.style.display = 'block';
-                respOtro.value = respGuardado;
-            } else {
-                respSelect.value = '';
-                respOtro.style.display = 'none';
-            }
+            document.getElementById('nuevoResponsable').value = activo._nuevoResponsable || '';
             document.getElementById('nuevoEstado').value = activo._nuevoEstado || '';
             document.getElementById('observaciones').value = activo._observaciones || '';
             const nuevaUb = activo._nuevaUbicacion || '';
@@ -660,7 +590,6 @@
             document.getElementById('searchInput').value = activo.CODIGOAF || '';
             document.getElementById('clearSearchBtn').style.display = 'inline-flex';
         }
-
         function actualizarSubUbicaciones() {
             const piso = document.getElementById('nuevoPiso').value;
             const sub = document.getElementById('nuevaSubUbicacion');
@@ -672,53 +601,43 @@
         }
 
         // ===================== GUARDAR / MARCAR =====================
-        function obtenerResponsableFinal(idSelect, idOtro) {
-            const select = document.getElementById(idSelect);
-            const otro = document.getElementById(idOtro);
-            if (select.value === '__otro__') return otro.value.trim();
-            return select.value;
-        }
-
         function guardarCambios() {
             if (!activoActual) return;
             const piso = document.getElementById('nuevoPiso').value;
             const sub = document.getElementById('nuevaSubUbicacion').value;
             if (!piso || !sub) { mostrarToast('Seleccione piso y ubicación', 'error'); return; }
             const nuevaUb = sub;
-            const resp = obtenerResponsableFinal('nuevoResponsable', 'otroResponsable');
+            const resp = document.getElementById('nuevoResponsable').value.trim();
             const estadoSeleccionado = document.getElementById('nuevoEstado').value;
             const obs = document.getElementById('observaciones').value.trim();
-            const ubicacionOriginal = activoActual._ubicacionOriginal || '';
-            const estadoOriginal = activoActual._estadoOriginal || '';
-            const tipo = (nuevaUb !== ubicacionOriginal || resp !== (activoActual._responsableOriginal||'') || estadoSeleccionado !== '') ? 'con_cambio' : 'sin_cambio';
+            const ubicacionOriginal = obtenerUbicacionOriginal(activoActual);
+            const estadoOriginal = obtenerEstadoOriginal(activoActual);
+            const tipo = (nuevaUb !== ubicacionOriginal || resp !== (activoActual['NOM RESP ANT']||'') || estadoSeleccionado !== '') ? 'con_cambio' : 'sin_cambio';
             const estadoFinal = estadoSeleccionado || estadoOriginal;
             Object.assign(activoActual, {_estadoInventario: tipo, _nuevaUbicacion: nuevaUb, _nuevoResponsable: resp, _nuevoEstado: estadoFinal, _observaciones: obs});
-            const reg = {codigo: activoActual.CODIGOAF, nombre: activoActual.NOMBREAF, ubicacionOriginal, nuevaUbicacion: nuevaUb, responsableOriginal: activoActual._responsableOriginal||'', nuevoResponsable: resp, estado: estadoFinal, tipo, observaciones: obs};
+            const reg = {codigo: activoActual.CODIGOAF, nombre: activoActual.NOMBREAF, ubicacionOriginal, nuevaUbicacion: nuevaUb, responsableOriginal: activoActual['NOM RESP ANT']||'', nuevoResponsable: resp, estado: estadoFinal, tipo, observaciones: obs};
             const idx = historialInventario.findIndex(h => h.codigo === reg.codigo);
             if (idx>=0) historialInventario[idx] = reg; else historialInventario.push(reg);
             guardarEnLocalStorage(); actualizarDashboard(); actualizarTablaHistorial();
             mostrarToast('✅ Guardado');
             setTimeout(() => buscarPrimerPendiente(), 800);
         }
-
         function marcarSinCambios() {
             if (!activoActual) return;
-            const ubicacionOriginal = activoActual._ubicacionOriginal || '';
-            const estadoOriginal = activoActual._estadoOriginal || '';
-            Object.assign(activoActual, {_estadoInventario:'sin_cambio', _nuevaUbicacion: ubicacionOriginal, _nuevoResponsable: activoActual._responsableOriginal||'', _nuevoEstado: estadoOriginal, _observaciones:''});
-            const reg = {codigo: activoActual.CODIGOAF, nombre: activoActual.NOMBREAF, ubicacionOriginal, nuevaUbicacion: ubicacionOriginal, responsableOriginal: activoActual._responsableOriginal||'', nuevoResponsable: activoActual._responsableOriginal||'', estado: estadoOriginal, tipo:'sin_cambio', observaciones:''};
+            const ubicacionOriginal = obtenerUbicacionOriginal(activoActual);
+            const estadoOriginal = obtenerEstadoOriginal(activoActual);
+            Object.assign(activoActual, {_estadoInventario:'sin_cambio', _nuevaUbicacion: ubicacionOriginal, _nuevoResponsable: activoActual['NOM RESP ANT']||'', _nuevoEstado: estadoOriginal, _observaciones:''});
+            const reg = {codigo: activoActual.CODIGOAF, nombre: activoActual.NOMBREAF, ubicacionOriginal, nuevaUbicacion: ubicacionOriginal, responsableOriginal: activoActual['NOM RESP ANT']||'', nuevoResponsable: activoActual['NOM RESP ANT']||'', estado: estadoOriginal, tipo:'sin_cambio', observaciones:''};
             const idx = historialInventario.findIndex(h => h.codigo === reg.codigo);
             if (idx>=0) historialInventario[idx] = reg; else historialInventario.push(reg);
             guardarEnLocalStorage(); actualizarDashboard(); actualizarTablaHistorial();
             mostrarToast('✅ Sin cambios');
             setTimeout(() => buscarPrimerPendiente(), 800);
         }
-
         function limpiarFormulario() {
             document.getElementById('nuevoPiso').value='';
             actualizarSubUbicaciones();
             document.getElementById('nuevoResponsable').value='';
-            document.getElementById('otroResponsable').style.display='none';
             document.getElementById('nuevoEstado').value='';
             document.getElementById('observaciones').value='';
         }
@@ -755,79 +674,34 @@
             }
             actualizarTablaHistorial();
         }
-
-        function cambiarFiltroPiso() {
-            const sel = document.getElementById('filtroPisoSelect');
-            filtroPiso = sel.value || null;
-            actualizarSelectUbicaciones();
-            document.getElementById('filtroUbicacionSelect').value = '';
-            filtroUbicacion = null;
-            actualizarTablaHistorial();
-        }
-
-        function cambiarFiltroUbicacion() {
-            const sel = document.getElementById('filtroUbicacionSelect');
-            filtroUbicacion = sel.value || null;
-            actualizarTablaHistorial();
-        }
-
-        function cambiarFiltroResponsable() {
-            const sel = document.getElementById('filtroResponsableSelect');
-            filtroResponsable = sel.value || null;
-            actualizarTablaHistorial();
-        }
-
-        function actualizarSelectUbicaciones() {
-            const selUbicacion = document.getElementById('filtroUbicacionSelect');
-            selUbicacion.innerHTML = '<option value="">📍 Todas las ubicaciones</option>';
-            const pisoSeleccionado = document.getElementById('filtroPisoSelect').value;
-            if (pisoSeleccionado && UBICACIONES_POR_PISO[pisoSeleccionado]) {
-                UBICACIONES_POR_PISO[pisoSeleccionado].forEach(u => {
-                    const opt = document.createElement('option');
-                    opt.value = u; opt.textContent = u;
-                    selUbicacion.appendChild(opt);
-                });
+        function togglePisoFilter(piso, el) {
+            if (filtroPiso === piso) {
+                filtroPiso = null;
+                el.classList.remove('active');
             } else {
-                for (let piso in UBICACIONES_POR_PISO) {
-                    UBICACIONES_POR_PISO[piso].forEach(u => {
-                        const opt = document.createElement('option');
-                        opt.value = u; opt.textContent = u;
-                        selUbicacion.appendChild(opt);
-                    });
-                }
+                document.querySelectorAll('.filter-chip[data-filter="PB"], .filter-chip[data-filter="P1"], .filter-chip[data-filter="P2"], .filter-chip[data-filter="P3"], .filter-chip[data-filter="Terraza"]')
+                    .forEach(c => c.classList.remove('active'));
+                filtroPiso = piso;
+                el.classList.add('active');
             }
+            actualizarTablaHistorial();
         }
-
-        function actualizarSelectResponsables() {
-            const selResp = document.getElementById('filtroResponsableSelect');
-            selResp.innerHTML = '<option value="">👤 Todos los responsables</option>';
-            LISTA_RESPONSABLES.forEach(nombre => {
-                const opt = document.createElement('option');
-                opt.value = nombre; opt.textContent = nombre;
-                selResp.appendChild(opt);
-            });
-        }
-
         function filtrarTabla() { actualizarTablaHistorial(); }
 
         function actualizarTablaHistorial() {
             const tbody = document.getElementById('historyTableBody');
             const texto = (document.getElementById('filterTable')?.value || '').toLowerCase();
             let datos = [...historialInventario];
-            // Agregar pendientes sin registro
             activosDB.filter(a => a._estadoInventario === 'pendiente' && !datos.some(h => h.codigo === a.CODIGOAF))
-                .forEach(a => datos.push({ codigo: a.CODIGOAF, nombre: a.NOMBREAF, ubicacionOriginal: a._ubicacionOriginal||'', nuevaUbicacion: '', nuevoResponsable: '', estado: a._estadoOriginal||'', tipo: 'pendiente', observaciones: '' }));
-            // Agregar nuevos sin registro
+                .forEach(a => datos.push({ codigo: a.CODIGOAF, nombre: a.NOMBREAF, ubicacionOriginal: obtenerUbicacionOriginal(a), nuevaUbicacion: '', nuevoResponsable: '', estado: obtenerEstadoOriginal(a), tipo: 'pendiente', observaciones: '' }));
             activosDB.filter(a => a._estadoInventario === 'nuevo' && !datos.some(h => h.codigo === a.CODIGOAF))
-                .forEach(a => datos.push({ codigo: a.CODIGOAF, nombre: a.NOMBREAF || '(Nuevo)', ubicacionOriginal: '', nuevaUbicacion: a._nuevaUbicacion, nuevoResponsable: a._nuevoResponsable, estado: a._nuevoEstado||'', tipo: 'nuevo', observaciones: a._observaciones }));
+                .forEach(a => datos.push({ codigo: a.CODIGOAF, nombre: a.NOMBREAF || '(Nuevo)', ubicacionOriginal: '', nuevaUbicacion: a._nuevaUbicacion, nuevoResponsable: a._nuevoResponsable, estado: a._nuevoEstado || '', tipo: 'nuevo', observaciones: a._observaciones }));
 
-            // Aplicar filtro de estado
             if (filtroEstado === null) {
                 datos = datos.filter(h => h.tipo === 'sin_cambio' || h.tipo === 'con_cambio');
             } else if (filtroEstado !== 'todos') {
                 datos = datos.filter(h => h.tipo === filtroEstado);
             }
-            // Filtro de piso
             if (filtroPiso) {
                 datos = datos.filter(h => {
                     if (h.tipo === 'pendiente') return UBICACIONES_POR_PISO[filtroPiso].some(u => h.ubicacionOriginal.includes(u));
@@ -835,23 +709,7 @@
                     else return h.nuevaUbicacion && UBICACIONES_POR_PISO[filtroPiso].includes(h.nuevaUbicacion);
                 });
             }
-            // Filtro de ubicación específica
-            if (filtroUbicacion) {
-                datos = datos.filter(h => {
-                    if (h.tipo === 'pendiente') return h.ubicacionOriginal === filtroUbicacion;
-                    else if (h.tipo === 'nuevo') return h.nuevaUbicacion === filtroUbicacion;
-                    else return h.nuevaUbicacion === filtroUbicacion || h.ubicacionOriginal === filtroUbicacion;
-                });
-            }
-            // Filtro por responsable (original o nuevo)
-            if (filtroResponsable) {
-                datos = datos.filter(h => {
-                    return h.nuevoResponsable === filtroResponsable || h.responsableOriginal === filtroResponsable;
-                });
-            }
-            // Filtro de texto
             if (texto) datos = datos.filter(h => (h.codigo||'').toLowerCase().includes(texto) || (h.nombre||'').toLowerCase().includes(texto));
-
             if (!datos.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty-state">📭 Sin registros</td></tr>'; return; }
             tbody.innerHTML = datos.map(h => `
                 <tr class="${h.tipo==='con_cambio'?'con-cambio': (h.tipo==='pendiente'?'pendiente': (h.tipo==='nuevo'?'nuevo':'inventariado'))}">
@@ -934,12 +792,12 @@
             const nuevosActivos = activosDB.filter(a => a._estadoInventario === 'nuevo');
             const hojaInventario = activosInventario.map(a => ({
                 CODIGOAF: a.CODIGOAF, NOMBREAF: a.NOMBREAF, DESCAF: a.DESCAF,
-                'UBICACION ORIGINAL': a._ubicacionOriginal || '',
-                'RESPONSABLE ORIGINAL': a._responsableOriginal || '',
-                'ESTADO ORIGINAL': a._estadoOriginal || '',
+                'UBICACION ORIGINAL': obtenerUbicacionOriginal(a),
+                'RESPONSABLE ORIGINAL': a['NOM RESP ANT'] || '',
+                'ESTADO ORIGINAL': obtenerEstadoOriginal(a),
                 'NUEVA UBICACION': a._estadoInventario === 'pendiente' ? '' : a._nuevaUbicacion,
                 'NUEVO RESPONSABLE': a._estadoInventario === 'pendiente' ? '' : a._nuevoResponsable,
-                'NUEVO ESTADO': a._estadoInventario === 'pendiente' ? '' : (a._nuevoEstado || a._estadoOriginal || ''),
+                'NUEVO ESTADO': a._estadoInventario === 'pendiente' ? '' : (a._nuevoEstado || obtenerEstadoOriginal(a)),
                 OBSERVACIONES: a._estadoInventario === 'pendiente' ? '' : a._observaciones,
                 'ESTADO INVENTARIO': a._estadoInventario
             }));
@@ -954,24 +812,11 @@
                 OBSERVACIONES: a._observaciones,
                 'ESTADO INVENTARIO': 'nuevo'
             }));
-            const hojaHistorial = historialInventario.map(h => ({
-                CODIGOAF: h.codigo,
-                NOMBREAF: h.nombre || '',
-                'UBICACION ORIGINAL': h.ubicacionOriginal || '',
-                'NUEVA UBICACION': h.nuevaUbicacion || '',
-                'RESPONSABLE ORIGINAL': h.responsableOriginal || '',
-                'NUEVO RESPONSABLE': h.nuevoResponsable || '',
-                ESTADO: h.estado || '',
-                TIPO: h.tipo || '',
-                OBSERVACIONES: h.observaciones || ''
-            }));
-
             const wb = XLSX.utils.book_new();
             if (hojaInventario.length) { const ws = XLSX.utils.json_to_sheet(hojaInventario); XLSX.utils.book_append_sheet(wb, ws, 'Inventario'); }
             if (hojaNuevos.length) { const ws = XLSX.utils.json_to_sheet(hojaNuevos); XLSX.utils.book_append_sheet(wb, ws, 'Nuevos Activos'); }
-            if (hojaHistorial.length) { const ws = XLSX.utils.json_to_sheet(hojaHistorial); XLSX.utils.book_append_sheet(wb, ws, 'Historial'); }
             descargarXLSX(wb, 'Progreso_Inventario_2026.xlsx');
-            mostrarToast('💾 Progreso guardado (3 hojas)');
+            mostrarToast('💾 Progreso guardado (2 hojas)');
         }
 
         function exportarExcel() { guardarProgresoXLSX(); }
@@ -982,77 +827,25 @@
             reader.onload = function(e) {
                 const data = new Uint8Array(e.target.result);
                 const wb = XLSX.read(data, {type:'array'});
-                // Cargar hoja de inventario
-                if (wb.SheetNames.length > 0) {
-                    const sheetInv = wb.Sheets[wb.SheetNames[0]];
-                    const jsonInv = XLSX.utils.sheet_to_json(sheetInv, {defval:''});
-                    if (jsonInv.length) {
-                        activosDB = jsonInv.map(a => {
-                            const newA = { ...a,
-                                _estadoInventario: a['ESTADO INVENTARIO'] || 'pendiente',
-                                _nuevaUbicacion: a['NUEVA UBICACION'] || '',
-                                _nuevoResponsable: a['NUEVO RESPONSABLE'] || '',
-                                _nuevoEstado: a['NUEVO ESTADO'] || '',
-                                _observaciones: a.OBSERVACIONES || ''
-                            };
-                            asegurarPropiedadesFijas(newA);
-                            return newA;
-                        });
-                        // Nuevos
-                        const hojaNuevos = wb.Sheets['Nuevos Activos'];
-                        if (hojaNuevos) {
-                            const jsonNuevos = XLSX.utils.sheet_to_json(hojaNuevos, {defval:''});
-                            jsonNuevos.forEach(a => {
-                                const nuevo = {
-                                    ...a,
-                                    _estadoInventario: 'nuevo',
-                                    _nuevaUbicacion: a['NUEVA UBICACION'] || '',
-                                    _nuevoResponsable: a['NUEVO RESPONSABLE'] || '',
-                                    _nuevoEstado: a['NUEVO ESTADO'] || '',
-                                    _observaciones: a.OBSERVACIONES || ''
-                                };
-                                asegurarPropiedadesFijas(nuevo);
-                                activosDB.push(nuevo);
-                            });
-                        }
-                        reconstruirMapa();
-                    }
-                }
-                // Cargar historial
-                const hojaHist = wb.Sheets['Historial'];
-                if (hojaHist) {
-                    const jsonHist = XLSX.utils.sheet_to_json(hojaHist, {defval:''});
-                    historialInventario = jsonHist.map(h => ({
-                        codigo: h.CODIGOAF || h.codigo || '',
-                        nombre: h.NOMBREAF || h.nombre || '',
-                        ubicacionOriginal: h['UBICACION ORIGINAL'] || h.ubicacionOriginal || '',
-                        nuevaUbicacion: h['NUEVA UBICACION'] || h.nuevaUbicacion || '',
-                        responsableOriginal: h['RESPONSABLE ORIGINAL'] || h.responsableOriginal || '',
-                        nuevoResponsable: h['NUEVO RESPONSABLE'] || h.nuevoResponsable || '',
-                        estado: h.ESTADO || h.estado || '',
-                        tipo: h.TIPO || h.tipo || '',
-                        observaciones: h.OBSERVACIONES || h.observaciones || ''
+                const sheet = wb.Sheets[wb.SheetNames[0]];
+                const json = XLSX.utils.sheet_to_json(sheet, {defval:''});
+                if (json.length) {
+                    activosDB = json.map(a => ({
+                        ...a,
+                        _estadoInventario: a['ESTADO INVENTARIO'] || 'pendiente',
+                        _nuevaUbicacion: a['NUEVA UBICACION'] || '',
+                        _nuevoResponsable: a['NUEVO RESPONSABLE'] || '',
+                        _nuevoEstado: a['NUEVO ESTADO'] || '',
+                        _observaciones: a.OBSERVACIONES || ''
                     }));
+                    reconstruirMapa(); guardarEnLocalStorage(); actualizarDashboard(); actualizarTablaHistorial();
+                    mostrarToast('📥 Progreso cargado');
                 }
-                guardarEnLocalStorage();
-                actualizarDashboard();
-                actualizarTablaHistorial();
-                mostrarToast('📥 Progreso cargado completamente');
             };
             reader.readAsArrayBuffer(file);
         }
 
         // ===================== UTILIDADES =====================
-        function toggleOtroCampo(idSelect, idOtro) {
-            const select = document.getElementById(idSelect);
-            const otro = document.getElementById(idOtro);
-            if (select.value === '__otro__') {
-                otro.style.display = 'block';
-            } else {
-                otro.style.display = 'none';
-            }
-        }
-
         function toggleMenu() { document.getElementById('menuOverlay').classList.toggle('active'); }
         function closeMenu(e) { if (e.target === document.getElementById('menuOverlay')) document.getElementById('menuOverlay').classList.remove('active'); }
         function closeMenuDirect() { document.getElementById('menuOverlay').classList.remove('active'); }
