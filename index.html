@@ -91,7 +91,7 @@
         .camera-overlay.active { display: flex; }
         #reader { width: 100%; height: 100%; }
         #qr-shaded-region { display: none !important; }
-        .close-camera-btn { position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.5rem; cursor: pointer; z-index: 301; display: flex; align-items: center; justify-content: center; }
+        .close-camera-btn { position: absolute; top: 4rem; right: 1rem; background: rgba(255,255,255,0.3); color: white; border: none; border-radius: 50%; width: 44px; height: 44px; font-size: 1.5rem; cursor: pointer; z-index: 301; display: flex; align-items: center; justify-content: center; }
         .new-asset-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 250; justify-content: center; align-items: center; padding: 1rem; }
         .new-asset-overlay.active { display: flex; }
         .new-asset-panel { background: var(--card); border-radius: var(--radius); padding: 1.5rem; max-width: 500px; width: 100%; box-shadow: 0 12px 32px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; }
@@ -440,7 +440,6 @@
             activosDB.forEach(a => { const cod = (a.CODIGOAF||'').trim(); if(cod) activosMap[cod] = a; });
         }
 
-        // Funciones robustas para obtener datos originales (compatibles Android)
         function obtenerUbicacionOriginal(activo) {
             return activo['NOM UBICACION'] || activo['NOMUBICACION'] || activo['NOM_UBICACION'] || activo['NOM UBICACIÓN'] || '';
         }
@@ -451,7 +450,7 @@
             return activo['OBSERV ESTADO'] || activo['OBSERVESTADO'] || activo['ESTADOAF'] || activo['OBSERV_ESTADO'] || '';
         }
 
-        // ===================== IMPORTAR (normalización extrema) =====================
+        // ===================== IMPORTAR =====================
         function normalizarClave(key) {
             return key.trim().toUpperCase().replace(/\s+/g, '');
         }
@@ -510,7 +509,7 @@
             escaneando = true;
             html5QrScanner = new Html5Qrcode("reader");
             const config = {
-                fps: 10,
+                fps: 15,
                 qrbox: obtenerDimensionesQrBox,
                 formatsToSupport: [
                     Html5QrcodeSupportedFormats.QR_CODE,
@@ -543,13 +542,72 @@
         }
 
         // ===================== NUEVO ACTIVO =====================
-        function openNewAssetForm() { /* ... igual ... */ }
-        function closeNewAssetForm() { /* ... igual ... */ }
-        function actualizarSubUbicaciones_New() { /* ... igual ... */ }
-        function guardarNuevoActivo() { /* ... igual ... */ }
+        function openNewAssetForm() {
+            document.getElementById('newAssetOverlay').classList.add('active');
+            document.getElementById('newCodigo').value = '';
+            document.getElementById('newNuevoPiso').value = '';
+            actualizarSubUbicaciones_New();
+            document.getElementById('newNuevoResponsable').value = '';
+            document.getElementById('newOtroResponsable').style.display = 'none';
+            document.getElementById('newNuevoEstado').value = '';
+            document.getElementById('newObservaciones').value = '';
+        }
+        function closeNewAssetForm() { document.getElementById('newAssetOverlay').classList.remove('active'); }
+        function actualizarSubUbicaciones_New() {
+            const piso = document.getElementById('newNuevoPiso').value;
+            const sub = document.getElementById('newNuevaSubUbicacion');
+            sub.innerHTML = '<option value="">Seleccionar...</option>';
+            if (piso && UBICACIONES_POR_PISO[piso]) {
+                sub.disabled = false;
+                UBICACIONES_POR_PISO[piso].forEach(u => { const opt = document.createElement('option'); opt.value = u; opt.textContent = u; sub.appendChild(opt); });
+            } else { sub.disabled = true; }
+        }
+        function guardarNuevoActivo() {
+            const piso = document.getElementById('newNuevoPiso').value;
+            const sub = document.getElementById('newNuevaSubUbicacion').value;
+            if (!piso || !sub) { mostrarToast('Seleccione piso y ubicación', 'error'); return; }
+            const codigo = document.getElementById('newCodigo').value.trim() || ('NUEVO-' + Date.now());
+            const respSelect = document.getElementById('newNuevoResponsable').value;
+            const respOtro = document.getElementById('newOtroResponsable').value.trim();
+            const resp = (respSelect === '__otro__') ? respOtro : respSelect;
+            const estado = document.getElementById('newNuevoEstado').value;
+            const obs = document.getElementById('newObservaciones').value.trim();
+            const nuevoActivo = {
+                CODIGOAF: codigo,
+                NOMBREAF: '',
+                DESCAF: '',
+                'NOM UBICACION': '',
+                'NOM RESP ANT': '',
+                ESTADOAF: '',
+                'OBSERV ESTADO': estado,
+                _estadoInventario: 'nuevo',
+                _nuevaUbicacion: sub,
+                _nuevoResponsable: resp,
+                _nuevoEstado: estado,
+                _observaciones: obs,
+                _codigoAuto: codigo
+            };
+            activosDB.push(nuevoActivo);
+            reconstruirMapa();
+            guardarEnLocalStorage();
+            actualizarDashboard();
+            actualizarTablaHistorial();
+            mostrarToast('✅ Nuevo activo agregado');
+            closeNewAssetForm();
+        }
 
         // ===================== BÚSQUEDA Y NAVEGACIÓN =====================
-        function buscarActivo() { /* ... igual ... */ }
+        function buscarActivo() {
+            const codigo = document.getElementById('searchInput').value.trim();
+            if (!codigo) return;
+            const activo = activosMap[codigo];
+            if (activo) { resultadosBusqueda = [activo]; indiceNavegacion = 0; mostrarActivo(activo); return; }
+            const resultados = activosDB.filter(a => (a.CODIGOAF||'').toLowerCase().includes(codigo.toLowerCase()));
+            if (resultados.length === 1) { resultadosBusqueda = resultados; indiceNavegacion = 0; mostrarActivo(resultados[0]); }
+            else if (resultados.length > 1) { resultadosBusqueda = resultados; indiceNavegacion = 0; mostrarActivo(resultados[0]); mostrarToast(`🔍 ${resultados.length} resultados`); }
+            else { mostrarToast('❌ No encontrado'); }
+            document.getElementById('clearSearchBtn').style.display = 'inline-flex';
+        }
         function limpiarBusqueda() {
             const input = document.getElementById('searchInput');
             input.value = '';
@@ -557,10 +615,69 @@
             activoActual = null; resultadosBusqueda = []; indiceNavegacion = -1;
             document.getElementById('clearSearchBtn').style.display = 'none';
         }
-        function buscarPrimerPendiente() { /* ... igual ... */ }
-        function navegarActivo(dir) { /* ... igual ... */ }
-        function mostrarActivo(activo) { /* ... igual ... */ }
-        function actualizarSubUbicaciones() { /* ... igual ... */ }
+        function buscarPrimerPendiente() {
+            const pendientes = activosDB.filter(a => a._estadoInventario === 'pendiente');
+            if (!pendientes.length) { mostrarToast('🎉 Todos inventariados'); return; }
+            resultadosBusqueda = pendientes; indiceNavegacion = 0; mostrarActivo(pendientes[0]);
+            document.getElementById('clearSearchBtn').style.display = 'inline-flex';
+        }
+        function navegarActivo(dir) {
+            if (!resultadosBusqueda.length) return;
+            indiceNavegacion = (indiceNavegacion + dir + resultadosBusqueda.length) % resultadosBusqueda.length;
+            mostrarActivo(resultadosBusqueda[indiceNavegacion]);
+        }
+        function mostrarActivo(activo) {
+            activoActual = activo;
+            document.getElementById('assetDetail').classList.add('active');
+            document.getElementById('assetCode').textContent = activo.CODIGOAF || '-';
+            document.getElementById('assetNombre').textContent = activo.NOMBREAF || '-';
+            document.getElementById('assetDescripcion').textContent = activo.DESCAF || '-';
+            document.getElementById('assetUbicacion').textContent = obtenerUbicacionOriginal(activo);
+            document.getElementById('assetResponsable').textContent = obtenerResponsableOriginal(activo);
+            document.getElementById('assetEstadoOriginal').textContent = obtenerEstadoOriginal(activo);
+            const badge = document.getElementById('assetStatusBadge');
+            badge.className = 'asset-status-badge';
+            const est = activo._estadoInventario || 'pendiente';
+            if (est === 'sin_cambio') { badge.classList.add('badge-sin-cambio'); badge.textContent = '✅ SIN CAMBIOS'; }
+            else if (est === 'con_cambio') { badge.classList.add('badge-cambio'); badge.textContent = '🔄 CON CAMBIOS'; }
+            else if (est === 'nuevo') { badge.classList.add('badge-nuevo'); badge.textContent = '🆕 NUEVO'; }
+            else { badge.classList.add('badge-pendiente'); badge.textContent = '⏳ PENDIENTE'; }
+            document.getElementById('navInfo').textContent = resultadosBusqueda.length > 1 ? `${indiceNavegacion+1}/${resultadosBusqueda.length}` : '';
+            const respSelect = document.getElementById('nuevoResponsable');
+            const respOtro = document.getElementById('otroResponsable');
+            const respGuardado = activo._nuevoResponsable || '';
+            const listaResponsables = Array.from(respSelect.options).map(o => o.value);
+            if (listaResponsables.includes(respGuardado)) {
+                respSelect.value = respGuardado;
+                respOtro.style.display = 'none';
+            } else if (respGuardado) {
+                respSelect.value = '__otro__';
+                respOtro.style.display = 'block';
+                respOtro.value = respGuardado;
+            } else {
+                respSelect.value = '';
+                respOtro.style.display = 'none';
+            }
+            document.getElementById('nuevoEstado').value = activo._nuevoEstado || '';
+            document.getElementById('observaciones').value = activo._observaciones || '';
+            const nuevaUb = activo._nuevaUbicacion || '';
+            let pisoSel = '';
+            for (let [piso, ubs] of Object.entries(UBICACIONES_POR_PISO)) { if (ubs.includes(nuevaUb)) { pisoSel = piso; break; } }
+            document.getElementById('nuevoPiso').value = pisoSel;
+            actualizarSubUbicaciones();
+            document.getElementById('nuevaSubUbicacion').value = nuevaUb;
+            document.getElementById('searchInput').value = activo.CODIGOAF || '';
+            document.getElementById('clearSearchBtn').style.display = 'inline-flex';
+        }
+        function actualizarSubUbicaciones() {
+            const piso = document.getElementById('nuevoPiso').value;
+            const sub = document.getElementById('nuevaSubUbicacion');
+            sub.innerHTML = '<option value="">Seleccionar...</option>';
+            if (piso && UBICACIONES_POR_PISO[piso]) {
+                sub.disabled = false;
+                UBICACIONES_POR_PISO[piso].forEach(u => { const opt = document.createElement('option'); opt.value = u; opt.textContent = u; sub.appendChild(opt); });
+            } else { sub.disabled = true; }
+        }
 
         function obtenerResponsableFinal(idSelect, idOtro) {
             const select = document.getElementById(idSelect);
@@ -569,16 +686,70 @@
             return select.value;
         }
 
-        function guardarCambios() { /* ... igual ... */ }
-        function marcarSinCambios() { /* ... igual ... */ }
-        function limpiarFormulario() { /* ... igual ... */ }
+        function guardarCambios() {
+            if (!activoActual) return;
+            const piso = document.getElementById('nuevoPiso').value;
+            const sub = document.getElementById('nuevaSubUbicacion').value;
+            if (!piso || !sub) { mostrarToast('Seleccione piso y ubicación', 'error'); return; }
+            const nuevaUb = sub;
+            const resp = obtenerResponsableFinal('nuevoResponsable', 'otroResponsable');
+            const estadoSeleccionado = document.getElementById('nuevoEstado').value;
+            const obs = document.getElementById('observaciones').value.trim();
+            const ubicacionOriginal = obtenerUbicacionOriginal(activoActual);
+            const estadoOriginal = obtenerEstadoOriginal(activoActual);
+            const tipo = (nuevaUb !== ubicacionOriginal || resp !== (obtenerResponsableOriginal(activoActual)) || estadoSeleccionado !== '') ? 'con_cambio' : 'sin_cambio';
+            const estadoFinal = estadoSeleccionado || estadoOriginal;
+            Object.assign(activoActual, {_estadoInventario: tipo, _nuevaUbicacion: nuevaUb, _nuevoResponsable: resp, _nuevoEstado: estadoFinal, _observaciones: obs});
+            const reg = {codigo: activoActual.CODIGOAF, nombre: activoActual.NOMBREAF, ubicacionOriginal, nuevaUbicacion: nuevaUb, responsableOriginal: obtenerResponsableOriginal(activoActual), nuevoResponsable: resp, estado: estadoFinal, tipo, observaciones: obs};
+            const idx = historialInventario.findIndex(h => h.codigo === reg.codigo);
+            if (idx>=0) historialInventario[idx] = reg; else historialInventario.push(reg);
+            guardarEnLocalStorage(); actualizarDashboard(); actualizarTablaHistorial();
+            mostrarToast('✅ Guardado');
+            setTimeout(() => buscarPrimerPendiente(), 800);
+        }
+        function marcarSinCambios() {
+            if (!activoActual) return;
+            const ubicacionOriginal = obtenerUbicacionOriginal(activoActual);
+            const estadoOriginal = obtenerEstadoOriginal(activoActual);
+            const respOriginal = obtenerResponsableOriginal(activoActual);
+            Object.assign(activoActual, {_estadoInventario:'sin_cambio', _nuevaUbicacion: ubicacionOriginal, _nuevoResponsable: respOriginal, _nuevoEstado: estadoOriginal, _observaciones:''});
+            const reg = {codigo: activoActual.CODIGOAF, nombre: activoActual.NOMBREAF, ubicacionOriginal, nuevaUbicacion: ubicacionOriginal, responsableOriginal: respOriginal, nuevoResponsable: respOriginal, estado: estadoOriginal, tipo:'sin_cambio', observaciones:''};
+            const idx = historialInventario.findIndex(h => h.codigo === reg.codigo);
+            if (idx>=0) historialInventario[idx] = reg; else historialInventario.push(reg);
+            guardarEnLocalStorage(); actualizarDashboard(); actualizarTablaHistorial();
+            mostrarToast('✅ Sin cambios');
+            setTimeout(() => buscarPrimerPendiente(), 800);
+        }
+        function limpiarFormulario() {
+            document.getElementById('nuevoPiso').value='';
+            actualizarSubUbicaciones();
+            document.getElementById('nuevoResponsable').value='';
+            document.getElementById('otroResponsable').style.display='none';
+            document.getElementById('nuevoEstado').value='';
+            document.getElementById('observaciones').value='';
+        }
 
-        function actualizarDashboard() { /* ... igual ... */ }
+        function actualizarDashboard() {
+            const total = activosDB.length;
+            const pendientes = activosDB.filter(a=>a._estadoInventario==='pendiente').length;
+            const sin = activosDB.filter(a=>a._estadoInventario==='sin_cambio').length;
+            const con = activosDB.filter(a=>a._estadoInventario==='con_cambio').length;
+            const nuevos = activosDB.filter(a=>a._estadoInventario==='nuevo').length;
+            const inventariados = sin + con + nuevos;
+            const pct = total ? Math.round((inventariados / total) * 100) : 0;
+            document.getElementById('totalActivos').textContent = total;
+            document.getElementById('pendientes').textContent = pendientes;
+            document.getElementById('inventariados').textContent = inventariados;
+            document.getElementById('conCambios').textContent = con;
+            document.getElementById('porcentajeProgreso').textContent = pct + '%';
+            document.getElementById('progressBar').style.width = pct + '%';
+            document.getElementById('progressBar').textContent = pct > 0 ? pct + '%' : '';
+            document.getElementById('progressText').textContent = `${inventariados} de ${total} activos inventariados`;
+        }
 
         // ===================== FILTROS =====================
         function toggleStateFilter(tipo, el) {
             if (filtroEstado === tipo) {
-                // No permitir deseleccionar el estado por defecto (inventariados) a menos que se seleccione otro
                 if (tipo === 'inventariados') return;
                 filtroEstado = 'inventariados';
                 document.querySelectorAll('.filter-chip[data-filter="inventariados"], .filter-chip[data-filter="todos"], .filter-chip[data-filter="pendiente"], .filter-chip[data-filter="sin_cambio"], .filter-chip[data-filter="con_cambio"], .filter-chip[data-filter="nuevo"]')
@@ -650,19 +821,16 @@
         function actualizarTablaHistorial() {
             const tbody = document.getElementById('historyTableBody');
             let datos = [...historialInventario];
-            // Agregar pendientes y nuevos sin registro
             activosDB.filter(a => a._estadoInventario === 'pendiente' && !datos.some(h => h.codigo === a.CODIGOAF))
                 .forEach(a => datos.push({ codigo: a.CODIGOAF, nombre: a.NOMBREAF, ubicacionOriginal: obtenerUbicacionOriginal(a), nuevaUbicacion: '', nuevoResponsable: '', estado: obtenerEstadoOriginal(a), tipo: 'pendiente', observaciones: '', responsableOriginal: obtenerResponsableOriginal(a) }));
             activosDB.filter(a => a._estadoInventario === 'nuevo' && !datos.some(h => h.codigo === a.CODIGOAF))
                 .forEach(a => datos.push({ codigo: a.CODIGOAF, nombre: a.NOMBREAF || '(Nuevo)', ubicacionOriginal: '', nuevaUbicacion: a._nuevaUbicacion, nuevoResponsable: a._nuevoResponsable, estado: a._nuevoEstado || '', tipo: 'nuevo', observaciones: a._observaciones, responsableOriginal: '' }));
 
-            // Aplicar filtro de estado
             if (filtroEstado === 'inventariados') {
                 datos = datos.filter(h => h.tipo === 'sin_cambio' || h.tipo === 'con_cambio' || h.tipo === 'nuevo');
             } else if (filtroEstado !== 'todos') {
                 datos = datos.filter(h => h.tipo === filtroEstado);
             }
-            // Filtro de piso
             if (filtroPiso) {
                 datos = datos.filter(h => {
                     if (h.tipo === 'pendiente') return UBICACIONES_POR_PISO[filtroPiso].some(u => h.ubicacionOriginal.includes(u));
@@ -670,7 +838,6 @@
                     else return h.nuevaUbicacion && UBICACIONES_POR_PISO[filtroPiso].includes(h.nuevaUbicacion);
                 });
             }
-            // Filtro de ubicación
             if (filtroUbicacion) {
                 datos = datos.filter(h => {
                     if (h.tipo === 'pendiente') return h.ubicacionOriginal === filtroUbicacion;
@@ -678,7 +845,6 @@
                     else return h.nuevaUbicacion === filtroUbicacion || h.ubicacionOriginal === filtroUbicacion;
                 });
             }
-            // Filtro de responsable (búsqueda parcial)
             if (filtroResponsable) {
                 datos = datos.filter(h => {
                     const respOrig = (h.responsableOriginal || '').toLowerCase();
@@ -707,20 +873,182 @@
             }).join('');
         }
 
-        function eliminarRegistro(codigo) { /* ... igual ... */ }
-        function editarRegistro(codigo) { /* ... igual ... */ }
-        function limpiarHistorial() { /* ... igual ... */ }
+        function eliminarRegistro(codigo) {
+            if (!confirm('¿Eliminar este registro?')) return;
+            const activo = activosDB.find(a => a.CODIGOAF === codigo);
+            if (activo) {
+                if (activo._estadoInventario === 'nuevo') {
+                    activosDB = activosDB.filter(a => a.CODIGOAF !== codigo);
+                } else {
+                    activo._estadoInventario = 'pendiente';
+                    activo._nuevaUbicacion = '';
+                    activo._nuevoResponsable = '';
+                    activo._nuevoEstado = '';
+                    activo._observaciones = '';
+                }
+                reconstruirMapa();
+            }
+            historialInventario = historialInventario.filter(h => h.codigo !== codigo);
+            guardarEnLocalStorage();
+            actualizarDashboard();
+            actualizarTablaHistorial();
+            mostrarToast('Registro eliminado');
+        }
+
+        function editarRegistro(codigo) {
+            const activo = activosDB.find(a => a.CODIGOAF === codigo);
+            if (!activo) return;
+            resultadosBusqueda = [activo];
+            indiceNavegacion = 0;
+            mostrarActivo(activo);
+            document.getElementById('assetDetail').scrollIntoView({behavior:'smooth'});
+        }
+
+        function limpiarHistorial() {
+            if (confirm('¿Limpiar TODO el historial? Los activos volverán a pendiente (excepto nuevos, que serán eliminados).')) {
+                activosDB = activosDB.filter(a => a._estadoInventario !== 'nuevo');
+                activosDB.forEach(a => {
+                    a._estadoInventario = 'pendiente';
+                    a._nuevaUbicacion = '';
+                    a._nuevoResponsable = '';
+                    a._nuevoEstado = '';
+                    a._observaciones = '';
+                });
+                historialInventario = [];
+                reconstruirMapa();
+                guardarEnLocalStorage();
+                actualizarDashboard();
+                actualizarTablaHistorial();
+                mostrarToast('Historial y nuevos activos eliminados');
+            }
+        }
 
         // ===================== EXPORTAR / GUARDAR =====================
-        function descargarXLSX(wb, nombreArchivo) { /* ... igual ... */ }
+        function descargarXLSX(wb, nombreArchivo) {
+            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([wbout], { type: 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = nombreArchivo;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+        }
 
-        function guardarProgresoXLSX() { /* ... igual ... */ }
+        function guardarProgresoXLSX() {
+            if (!activosDB.length) { mostrarToast('⚠️ Sin datos'); return; }
+            const activosInventario = activosDB.filter(a => a._estadoInventario !== 'nuevo');
+            const nuevosActivos = activosDB.filter(a => a._estadoInventario === 'nuevo');
+            const hojaInventario = activosInventario.map(a => ({
+                CODIGOAF: a.CODIGOAF, NOMBREAF: a.NOMBREAF, DESCAF: a.DESCAF,
+                'UBICACION ORIGINAL': obtenerUbicacionOriginal(a),
+                'RESPONSABLE ORIGINAL': obtenerResponsableOriginal(a),
+                'ESTADO ORIGINAL': obtenerEstadoOriginal(a),
+                'NUEVA UBICACION': a._estadoInventario === 'pendiente' ? '' : a._nuevaUbicacion,
+                'NUEVO RESPONSABLE': a._estadoInventario === 'pendiente' ? '' : a._nuevoResponsable,
+                'NUEVO ESTADO': a._estadoInventario === 'pendiente' ? '' : (a._nuevoEstado || obtenerEstadoOriginal(a)),
+                OBSERVACIONES: a._estadoInventario === 'pendiente' ? '' : a._observaciones,
+                'ESTADO INVENTARIO': a._estadoInventario
+            }));
+            const hojaNuevos = nuevosActivos.map(a => ({
+                CODIGOAF: a.CODIGOAF, NOMBREAF: a.NOMBREAF || '', DESCAF: a.DESCAF || '',
+                'UBICACION ORIGINAL': '',
+                'RESPONSABLE ORIGINAL': '',
+                'ESTADO ORIGINAL': '',
+                'NUEVA UBICACION': a._nuevaUbicacion,
+                'NUEVO RESPONSABLE': a._nuevoResponsable,
+                'NUEVO ESTADO': a._nuevoEstado,
+                OBSERVACIONES: a._observaciones,
+                'ESTADO INVENTARIO': 'nuevo'
+            }));
+            const hojaHistorial = historialInventario.map(h => ({
+                CODIGOAF: h.codigo,
+                NOMBREAF: h.nombre || '',
+                'UBICACION ORIGINAL': h.ubicacionOriginal || '',
+                'NUEVA UBICACION': h.nuevaUbicacion || '',
+                'RESPONSABLE ORIGINAL': h.responsableOriginal || '',
+                'NUEVO RESPONSABLE': h.nuevoResponsable || '',
+                ESTADO: h.estado || '',
+                TIPO: h.tipo || '',
+                OBSERVACIONES: h.observaciones || ''
+            }));
+
+            const wb = XLSX.utils.book_new();
+            if (hojaInventario.length) { const ws = XLSX.utils.json_to_sheet(hojaInventario); XLSX.utils.book_append_sheet(wb, ws, 'Inventario'); }
+            if (hojaNuevos.length) { const ws = XLSX.utils.json_to_sheet(hojaNuevos); XLSX.utils.book_append_sheet(wb, ws, 'Nuevos Activos'); }
+            if (hojaHistorial.length) { const ws = XLSX.utils.json_to_sheet(hojaHistorial); XLSX.utils.book_append_sheet(wb, ws, 'Historial'); }
+            descargarXLSX(wb, 'Progreso_Inventario_2026.xlsx');
+            mostrarToast('💾 Progreso guardado (3 hojas)');
+        }
+
         function exportarExcel() { guardarProgresoXLSX(); }
-        function cargarProgresoXLSX(event) { /* ... igual ... */ }
+
+        function cargarProgresoXLSX(event) {
+            const file = event.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const wb = XLSX.read(data, {type:'array'});
+                if (wb.SheetNames.length > 0) {
+                    const sheetInv = wb.Sheets[wb.SheetNames[0]];
+                    const jsonInv = XLSX.utils.sheet_to_json(sheetInv, {defval:''});
+                    if (jsonInv.length) {
+                        activosDB = jsonInv.map(a => {
+                            const newRow = { ...a,
+                                _estadoInventario: a['ESTADO INVENTARIO'] || 'pendiente',
+                                _nuevaUbicacion: a['NUEVA UBICACION'] || '',
+                                _nuevoResponsable: a['NUEVO RESPONSABLE'] || '',
+                                _nuevoEstado: a['NUEVO ESTADO'] || '',
+                                _observaciones: a.OBSERVACIONES || ''
+                            };
+                            if (a['UBICACION ORIGINAL']) newRow['NOM UBICACION'] = a['UBICACION ORIGINAL'];
+                            if (a['RESPONSABLE ORIGINAL']) newRow['NOM RESP ANT'] = a['RESPONSABLE ORIGINAL'];
+                            if (a['ESTADO ORIGINAL']) newRow['OBSERV ESTADO'] = a['ESTADO ORIGINAL'];
+                            return newRow;
+                        });
+                        const hojaNuevos = wb.Sheets['Nuevos Activos'];
+                        if (hojaNuevos) {
+                            const jsonNuevos = XLSX.utils.sheet_to_json(hojaNuevos, {defval:''});
+                            jsonNuevos.forEach(a => {
+                                activosDB.push({
+                                    ...a,
+                                    _estadoInventario: 'nuevo',
+                                    _nuevaUbicacion: a['NUEVA UBICACION'] || '',
+                                    _nuevoResponsable: a['NUEVO RESPONSABLE'] || '',
+                                    _nuevoEstado: a['NUEVO ESTADO'] || '',
+                                    _observaciones: a.OBSERVACIONES || ''
+                                });
+                            });
+                        }
+                        reconstruirMapa();
+                    }
+                }
+                const hojaHist = wb.Sheets['Historial'];
+                if (hojaHist) {
+                    const jsonHist = XLSX.utils.sheet_to_json(hojaHist, {defval:''});
+                    historialInventario = jsonHist.map(h => ({
+                        codigo: h.CODIGOAF || h.codigo || '',
+                        nombre: h.NOMBREAF || h.nombre || '',
+                        ubicacionOriginal: h['UBICACION ORIGINAL'] || h.ubicacionOriginal || '',
+                        nuevaUbicacion: h['NUEVA UBICACION'] || h.nuevaUbicacion || '',
+                        responsableOriginal: h['RESPONSABLE ORIGINAL'] || h.responsableOriginal || '',
+                        nuevoResponsable: h['NUEVO RESPONSABLE'] || h.nuevoResponsable || '',
+                        estado: h.ESTADO || h.estado || '',
+                        tipo: h.TIPO || h.tipo || '',
+                        observaciones: h.OBSERVACIONES || h.observaciones || ''
+                    }));
+                }
+                guardarEnLocalStorage();
+                actualizarDashboard();
+                actualizarTablaHistorial();
+                mostrarToast('📥 Progreso cargado completamente');
+            };
+            reader.readAsArrayBuffer(file);
+        }
 
         // ===================== EXTRAER HISTORIAL =====================
         function extraerHistorial() {
-            // Obtener los datos actualmente visibles en la tabla
             const tbody = document.getElementById('historyTableBody');
             const filas = tbody.querySelectorAll('tr');
             if (filas.length === 0 || filas[0].querySelector('.empty-state')) {
@@ -750,16 +1078,35 @@
             mostrarToast('📊 Historial extraído correctamente');
         }
 
-        function toggleOtroCampo(idSelect, idOtro) { /* ... igual ... */ }
-        function toggleMenu() { /* ... igual ... */ }
-        function closeMenu(e) { /* ... igual ... */ }
-        function closeMenuDirect() { /* ... igual ... */ }
-        function mostrarToast(msg, tipo='info') { /* ... igual ... */ }
-        function mostrarSeccion(sec) { /* ... igual ... */ }
+        function toggleOtroCampo(idSelect, idOtro) {
+            const select = document.getElementById(idSelect);
+            const otro = document.getElementById(idOtro);
+            if (select.value === '__otro__') {
+                otro.style.display = 'block';
+            } else {
+                otro.style.display = 'none';
+            }
+        }
 
-        // Las funciones omitidas por brevedad son idénticas a la versión anterior aprobada.
-        // Se incluyen completas en el código final que se proporciona a continuación.
-        // ...
+        function toggleMenu() { document.getElementById('menuOverlay').classList.toggle('active'); }
+        function closeMenu(e) { if (e.target === document.getElementById('menuOverlay')) document.getElementById('menuOverlay').classList.remove('active'); }
+        function closeMenuDirect() { document.getElementById('menuOverlay').classList.remove('active'); }
+
+        function mostrarToast(msg, tipo='info') {
+            const cont = document.getElementById('toastContainer');
+            const t = document.createElement('div'); t.className = `toast ${tipo}`; t.textContent = msg;
+            cont.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        function mostrarSeccion(sec) {
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(el => el.classList.remove('active'));
+            const items = document.querySelectorAll('.bottom-nav .nav-item');
+            if (sec === 'dashboard') { items[0].classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
+            if (sec === 'historial') { items[2].classList.add('active'); document.querySelector('.history-section').scrollIntoView({behavior:'smooth'}); }
+            if (sec === 'importar') { items[3].classList.add('active'); }
+        }
+
         init();
     </script>
 </body>
