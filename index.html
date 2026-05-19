@@ -19,6 +19,11 @@
             --border: #e0e0e0; --text: #212121; --text-secondary: #616161; --shadow: 0 2px 8px rgba(0,0,0,0.1);
             --radius: 12px; --bottom-nav-height: 65px;
         }
+        body.modo-oscuro {
+            --primary: #263238; --primary-light: #37474f; --accent: #ffab00; --success: #4caf50;
+            --warning: #ff9800; --danger: #e53935; --info: #42a5f5; --bg: #121212; --card: #1e1e1e;
+            --border: #333333; --text: #e0e0e0; --text-secondary: #b0b0b0; --shadow: 0 2px 8px rgba(255,255,255,0.05);
+        }
         body { background: var(--bg); color: var(--text); min-height: 100vh; -webkit-tap-highlight-color: transparent; user-select: none; }
         .header { background: linear-gradient(135deg, var(--primary) 0%, #0d1b5e 100%); color: white; padding: 0.75rem 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.2); position: sticky; top: 0; z-index: 100; }
         .header-content { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
@@ -41,7 +46,7 @@
         .search-section { background: var(--card); border-radius: var(--radius); padding: 0.8rem; margin-bottom: 0.75rem; box-shadow: var(--shadow); }
         .search-row { display: flex; gap: 0.4rem; align-items: center; }
         .search-input-group { display: flex; flex: 1; min-width: 0; }
-        .search-input { flex: 1; padding: 0.6rem; border: 2px solid var(--border); border-radius: 8px 0 0 8px; font-size: 0.85rem; inputmode: numeric; }
+        .search-input { flex: 1; padding: 0.6rem; border: 2px solid var(--border); border-radius: 8px 0 0 8px; font-size: 0.85rem; inputmode: numeric; background: var(--card); color: var(--text); }
         .search-btn { padding: 0.6rem 0.9rem; background: var(--primary); color: white; border: none; border-radius: 0 8px 8px 0; font-weight: 600; cursor: pointer; }
         .clear-search-btn { background: none; border: 2px solid var(--border); border-radius: 8px; padding: 0.55rem; color: var(--danger); font-size: 1.1rem; cursor: pointer; display: none; flex-shrink: 0; }
         .scan-btn { background: #424242; color: white; border: none; border-radius: 8px; padding: 0.6rem 0.8rem; font-weight: 600; cursor: pointer; flex-shrink: 0; }
@@ -49,9 +54,9 @@
         @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(198,40,40,0.4); } 50% { box-shadow: 0 0 0 12px rgba(198,40,40,0); } }
         .quick-filters { background: var(--card); border-radius: var(--radius); padding: 0.8rem; margin-bottom: 0.75rem; box-shadow: var(--shadow); }
         .filter-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; align-items: center; }
-        .filter-chip { padding: 0.25rem 0.7rem; border-radius: 20px; font-size: 0.65rem; cursor: pointer; border: 1.5px solid var(--border); background: white; font-weight: 500; transition: 0.2s; text-align: center; }
+        .filter-chip { padding: 0.25rem 0.7rem; border-radius: 20px; font-size: 0.65rem; cursor: pointer; border: 1.5px solid var(--border); background: var(--card); font-weight: 500; transition: 0.2s; text-align: center; }
         .filter-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
-        .filter-select { padding: 0.25rem 0.5rem; border-radius: 20px; font-size: 0.65rem; border: 1.5px solid var(--border); background: white; font-weight: 500; color: var(--text); width: 100%; }
+        .filter-select, .filter-input { padding: 0.25rem 0.5rem; border-radius: 20px; font-size: 0.65rem; border: 1.5px solid var(--border); background: var(--card); font-weight: 500; color: var(--text); width: 100%; }
         .asset-detail { background: var(--card); border-radius: var(--radius); padding: 0.8rem; box-shadow: var(--shadow); margin-bottom: 0.75rem; display: none; }
         .asset-detail.active { display: block; }
         .asset-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.6rem; padding-bottom: 0.6rem; border-bottom: 2px solid var(--border); }
@@ -59,13 +64,14 @@
         .asset-status-badge { padding: 0.2rem 0.6rem; border-radius: 20px; font-weight: 600; font-size: 0.65rem; }
         .badge-pendiente { background: #fce4ec; color: #c62828; } .badge-sin-cambio { background: #e3f2fd; color: #1565c0; } .badge-cambio { background: #fff3e0; color: #e65100; } .badge-nuevo { background: #e8f5e9; color: #2e7d32; }
         .asset-info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.5rem; margin-bottom: 0.8rem; }
-        .info-item { background: #fafafa; padding: 0.5rem; border-radius: 8px; border-left: 3px solid var(--primary); }
+        .info-item { background: var(--card); padding: 0.5rem; border-radius: 8px; border-left: 3px solid var(--primary); }
         .info-label { font-size: 0.6rem; text-transform: uppercase; color: var(--text-secondary); font-weight: 600; }
         .info-value { font-weight: 500; font-size: 0.8rem; }
         .update-section { background: #fff8e1; border-radius: var(--radius); padding: 0.8rem; border: 2px solid #ffcc02; margin-top: 0.5rem; }
+        .modo-oscuro .update-section { background: #2d2d2d; border-color: #ffab00; }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.6rem; }
         .form-group label { font-weight: 600; font-size: 0.7rem; margin-bottom: 0.15rem; display: block; }
-        .form-group select, .form-group input, .form-group textarea { padding: 0.5rem; border: 2px solid var(--border); border-radius: 8px; font-size: 0.8rem; width: 100%; background: white; }
+        .form-group select, .form-group input, .form-group textarea { padding: 0.5rem; border: 2px solid var(--border); border-radius: 8px; font-size: 0.8rem; width: 100%; background: var(--card); color: var(--text); }
         .form-actions { display: flex; gap: 0.4rem; margin-top: 0.8rem; flex-wrap: wrap; }
         .form-actions .btn { pointer-events: auto; }
         .history-section { background: var(--card); border-radius: var(--radius); padding: 0.8rem; box-shadow: var(--shadow); }
@@ -119,79 +125,34 @@
         </div>
     </header>
 
-    <!-- Menú flotante (se abre desde la barra inferior) -->
+    <!-- Menú flotante -->
     <div class="menu-overlay" id="menuOverlay" onclick="closeMenu(event)">
         <div class="menu-panel" onclick="event.stopPropagation()">
             <div class="menu-item" onclick="document.getElementById('fileInputXlsx').click(); closeMenuDirect();">📂 Importar</div>
             <div class="menu-item" onclick="guardarProgresoXLSX(); closeMenuDirect();">💾 Guardar Progreso</div>
             <div class="menu-item" onclick="document.getElementById('loadProgressInputXlsx').click(); closeMenuDirect();">📥 Cargar Progreso</div>
             <div class="menu-item" onclick="exportarExcel(); closeMenuDirect();">📊 Exportar</div>
+            <div class="menu-item" onclick="toggleModoOscuro(); closeMenuDirect();" id="menuModoOscuro">🌙 Modo oscuro</div>
         </div>
     </div>
 
-    <!-- Cámara a pantalla completa -->
+    <!-- Cámara -->
     <div class="camera-overlay" id="cameraOverlay">
         <button class="close-camera-btn" onclick="detenerScanner()">✕</button>
         <div id="reader"></div>
     </div>
 
-    <!-- Formulario Nuevo Activo -->
+    <!-- Nuevo Activo -->
     <div class="new-asset-overlay" id="newAssetOverlay" onclick="if(event.target===this) closeNewAssetForm()">
         <div class="new-asset-panel" onclick="event.stopPropagation()">
-            <h3 style="margin-bottom:1rem;">➕ Agregar Nuevo Activo</h3>
+            <h3>➕ Agregar Nuevo Activo</h3>
             <div class="form-grid">
-                <div class="form-group">
-                    <label>Código (opcional)</label>
-                    <input type="text" id="newCodigo" placeholder="Dejar vacío para autoasignar">
-                </div>
-                <div class="form-group">
-                    <label>Nuevo Piso *</label>
-                    <select id="newNuevoPiso" onchange="actualizarSubUbicaciones_New()">
-                        <option value="">Seleccionar...</option>
-                        <option value="PB">Planta Baja</option><option value="P1">Piso 1</option><option value="P2">Piso 2</option>
-                        <option value="P3">Piso 3</option><option value="Terraza">Terraza</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Ubicación Específica *</label>
-                    <select id="newNuevaSubUbicacion" disabled><option>Primero elija piso</option></select>
-                </div>
-                <div class="form-group">
-                    <label>Nuevo Responsable</label>
-                    <select id="newNuevoResponsable" onchange="toggleOtroCampo('newNuevoResponsable','newOtroResponsable')">
-                        <option value="">Seleccionar...</option>
-                        <optgroup label="Personal">
-                            <option>Liz Aliaga</option><option>Sol Alipaz</option><option>Tatiana Aenitez</option>
-                            <option>Boris Aranisa</option><option>Luisa Canaviri</option><option>Manuel Chavez</option>
-                            <option>Fernando Fernandez</option><option>Yolanda Flores</option><option>Marianne Gassenmeier</option>
-                            <option>Armando Gonzales</option><option>Maks Gutierrez</option><option>Rosario Hinojosa</option>
-                            <option>Lourdes Ibañez</option><option>Sara Lozano</option><option>Jose Marca</option>
-                            <option>Abril Mercado</option><option>Carmen Pacheco</option><option>Lourdes Quispe</option>
-                            <option>Said Ramirez</option><option>Marcela Raya</option><option>Fortunato Tarqui</option>
-                            <option>Yessica Tarquino</option><option>Gabriela Torrez</option><option>Jorge Vasquez</option>
-                            <option>Ronald Vidaurre</option><option>Rene Barcena</option><option>Adriana Gomez</option>
-                            <option>Maria Jagatheswaran</option><option>Ricardo Alvarez</option><option>Enrique Ayo</option>
-                            <option>Guillermo Beltran</option><option>Luis Daza</option><option>Alberto Gozalves</option>
-                            <option>Andres Guzman</option><option>Osvaldo Irusta</option><option>Mauricio Maldonado</option>
-                            <option>Claudia Oporto</option><option>Mario Patiño</option><option>Jamil Rodas</option>
-                            <option>Jorge Rodriguez</option><option>Martin Salinas</option><option>Leonardo Taborga</option>
-                            <option>Leonel Quispe</option><option>Milton Rios</option>
-                        </optgroup>
-                        <option value="__otro__">– Otro –</option>
-                    </select>
-                    <input type="text" id="newOtroResponsable" placeholder="Escriba el nombre" style="display:none; margin-top:0.3rem;">
-                </div>
-                <div class="form-group">
-                    <label>Nuevo Estado</label>
-                    <select id="newNuevoEstado">
-                        <option value="">Sin cambios</option><option>Buen Estado</option><option>Mal Estado</option>
-                        <option>Obsoleto</option><option>En Movimiento</option><option>Revalúo</option>
-                    </select>
-                </div>
-                <div class="form-group" style="grid-column:1/-1;">
-                    <label>Observaciones</label>
-                    <textarea id="newObservaciones" rows="2" placeholder="Notas..."></textarea>
-                </div>
+                <div class="form-group"><label>Código (opcional)</label><input type="text" id="newCodigo" placeholder="Dejar vacío para autoasignar"></div>
+                <div class="form-group"><label>Nuevo Piso *</label><select id="newNuevoPiso" onchange="actualizarSubUbicaciones_New()"><option value="">Seleccionar...</option><option value="PB">Planta Baja</option><option value="P1">Piso 1</option><option value="P2">Piso 2</option><option value="P3">Piso 3</option><option value="Terraza">Terraza</option></select></div>
+                <div class="form-group"><label>Ubicación Específica *</label><input type="text" id="newNuevaSubUbicacion" list="newUbicacionesList" placeholder="Escriba o seleccione..." autocomplete="off"><datalist id="newUbicacionesList"></datalist></div>
+                <div class="form-group"><label>Nuevo Responsable</label><input type="text" id="newNuevoResponsable" list="newResponsablesList" placeholder="Escriba o seleccione..." autocomplete="off"><datalist id="newResponsablesList"></datalist></div>
+                <div class="form-group"><label>Nuevo Estado</label><input type="text" id="newNuevoEstado" list="estadosList" placeholder="Escriba o seleccione..." autocomplete="off"><datalist id="estadosList"><option>Buen Estado</option><option>Mal Estado</option><option>Obsoleto</option><option>En Movimiento</option><option>Revalúo</option></datalist></div>
+                <div class="form-group" style="grid-column:1/-1;"><label>Observaciones</label><textarea id="newObservaciones" rows="2" placeholder="Notas..."></textarea></div>
             </div>
             <div class="form-actions" style="margin-top:1rem;">
                 <button class="btn btn-success btn-sm" onclick="guardarNuevoActivo()">💾 Guardar Activo</button>
@@ -215,7 +176,6 @@
             <small id="progressText">0 de 0 activos inventariados</small>
         </div>
 
-        <!-- Sección de búsqueda / encontrar -->
         <div class="search-section">
             <div class="search-row">
                 <div class="search-input-group">
@@ -228,13 +188,9 @@
             </div>
         </div>
 
-        <!-- Detalle del activo (con registro de cambios) -->
         <div class="asset-detail" id="assetDetail">
             <div class="asset-header">
-                <div>
-                    <div class="asset-code" id="assetCode">-</div>
-                    <span class="asset-status-badge badge-pendiente" id="assetStatusBadge">PENDIENTE</span>
-                </div>
+                <div><div class="asset-code" id="assetCode">-</div><span class="asset-status-badge badge-pendiente" id="assetStatusBadge">PENDIENTE</span></div>
                 <div style="display:flex; gap:0.3rem; align-items:center;">
                     <button class="btn btn-sm btn-secondary" onclick="navegarActivo(-1)">◀</button>
                     <span id="navInfo" style="font-size:0.7rem;"></span>
@@ -251,54 +207,11 @@
             <div class="update-section">
                 <h3 style="margin-bottom:0.4rem;">✏️ Registrar cambios</h3>
                 <div class="form-grid">
-                    <div class="form-group">
-                        <label>Nuevo Piso *</label>
-                        <select id="nuevoPiso" onchange="actualizarSubUbicaciones()">
-                            <option value="">Seleccionar...</option>
-                            <option value="PB">Planta Baja</option><option value="P1">Piso 1</option><option value="P2">Piso 2</option>
-                            <option value="P3">Piso 3</option><option value="Terraza">Terraza</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Ubicación Específica *</label>
-                        <select id="nuevaSubUbicacion" disabled><option>Primero elija piso</option></select>
-                    </div>
-                    <div class="form-group">
-                        <label>Nuevo Responsable</label>
-                        <select id="nuevoResponsable" onchange="toggleOtroCampo('nuevoResponsable','otroResponsable')">
-                            <option value="">Seleccionar...</option>
-                            <optgroup label="Personal">
-                                <option>Liz Aliaga</option><option>Sol Alipaz</option><option>Tatiana Aenitez</option>
-                                <option>Boris Aranisa</option><option>Luisa Canaviri</option><option>Manuel Chavez</option>
-                                <option>Fernando Fernandez</option><option>Yolanda Flores</option><option>Marianne Gassenmeier</option>
-                                <option>Armando Gonzales</option><option>Maks Gutierrez</option><option>Rosario Hinojosa</option>
-                                <option>Lourdes Ibañez</option><option>Sara Lozano</option><option>Jose Marca</option>
-                                <option>Abril Mercado</option><option>Carmen Pacheco</option><option>Lourdes Quispe</option>
-                                <option>Said Ramirez</option><option>Marcela Raya</option><option>Fortunato Tarqui</option>
-                                <option>Yessica Tarquino</option><option>Gabriela Torrez</option><option>Jorge Vasquez</option>
-                                <option>Ronald Vidaurre</option><option>Rene Barcena</option><option>Adriana Gomez</option>
-                                <option>Maria Jagatheswaran</option><option>Ricardo Alvarez</option><option>Enrique Ayo</option>
-                                <option>Guillermo Beltran</option><option>Luis Daza</option><option>Alberto Gozalves</option>
-                                <option>Andres Guzman</option><option>Osvaldo Irusta</option><option>Mauricio Maldonado</option>
-                                <option>Claudia Oporto</option><option>Mario Patiño</option><option>Jamil Rodas</option>
-                                <option>Jorge Rodriguez</option><option>Martin Salinas</option><option>Leonardo Taborga</option>
-                                <option>Leonel Quispe</option><option>Milton Rios</option>
-                            </optgroup>
-                            <option value="__otro__">– Otro –</option>
-                        </select>
-                        <input type="text" id="otroResponsable" placeholder="Escriba el nombre" style="display:none; margin-top:0.3rem;">
-                    </div>
-                    <div class="form-group">
-                        <label>Nuevo Estado</label>
-                        <select id="nuevoEstado">
-                            <option value="">Sin cambios</option><option>Buen Estado</option><option>Mal Estado</option>
-                            <option>Obsoleto</option><option>En Movimiento</option><option>Revalúo</option>
-                        </select>
-                    </div>
-                    <div class="form-group" style="grid-column:1/-1;">
-                        <label>Observaciones</label>
-                        <textarea id="observaciones" rows="2" placeholder="Notas..."></textarea>
-                    </div>
+                    <div class="form-group"><label>Nuevo Piso *</label><select id="nuevoPiso" onchange="actualizarSubUbicaciones()"><option value="">Sin cambios</option><option value="PB">Planta Baja</option><option value="P1">Piso 1</option><option value="P2">Piso 2</option><option value="P3">Piso 3</option><option value="Terraza">Terraza</option></select></div>
+                    <div class="form-group"><label>Ubicación Específica</label><input type="text" id="nuevaSubUbicacion" list="subUbicacionesList" placeholder="Dejar vacío para no modificar" autocomplete="off"><datalist id="subUbicacionesList"></datalist></div>
+                    <div class="form-group"><label>Nuevo Responsable</label><input type="text" id="nuevoResponsable" list="responsablesList" placeholder="Dejar vacío para no modificar" autocomplete="off"><datalist id="responsablesList"></datalist></div>
+                    <div class="form-group"><label>Nuevo Estado</label><input type="text" id="nuevoEstado" list="estadosList2" placeholder="Dejar vacío para no modificar" autocomplete="off"><datalist id="estadosList2"><option>Buen Estado</option><option>Mal Estado</option><option>Obsoleto</option><option>En Movimiento</option><option>Revalúo</option></datalist></div>
+                    <div class="form-group" style="grid-column:1/-1;"><label>Observaciones</label><textarea id="observaciones" rows="2" placeholder="Notas..."></textarea></div>
                 </div>
                 <div class="form-actions">
                     <button class="btn btn-success btn-sm" onclick="guardarCambios()">💾 Guardar cambios</button>
@@ -308,7 +221,6 @@
             </div>
         </div>
 
-        <!-- Filtros (grid compacto con botón limpiar integrado) -->
         <div class="quick-filters">
             <div class="filter-grid">
                 <span class="filter-chip active" data-filter="inventariados" onclick="toggleStateFilter('inventariados', this)">📋 Inventariados</span>
@@ -318,19 +230,15 @@
                 <span class="filter-chip" data-filter="con_cambio" onclick="toggleStateFilter('con_cambio', this)">🔄 Con cambios</span>
                 <span class="filter-chip" data-filter="nuevo" onclick="toggleStateFilter('nuevo', this)">🆕 Nuevos</span>
                 <select id="filtroPisoSelect" class="filter-select" onchange="cambiarFiltroPiso()">
-                    <option value="">🏢 Todos los pisos</option>
-                    <option value="PB">PB</option><option value="P1">P1</option><option value="P2">P2</option><option value="P3">P3</option><option value="Terraza">Terraza</option>
+                    <option value="">🏢 Todos los pisos</option><option value="PB">PB</option><option value="P1">P1</option><option value="P2">P2</option><option value="P3">P3</option><option value="Terraza">Terraza</option>
                 </select>
-                <select id="filtroUbicacionSelect" class="filter-select" onchange="cambiarFiltroUbicacion()">
-                    <option value="">📍 Todas las ubicaciones</option>
-                </select>
-                <input type="text" id="filtroResponsableInput" class="filter-select" placeholder="👤 Responsable..." list="filtroResponsableList" oninput="cambiarFiltroResponsable()" autocomplete="off">
-                <button class="btn btn-sm" style="background:#f5f5f5; border:1.5px solid var(--border); border-radius:20px; font-size:0.65rem; padding:0.25rem 0.5rem; color:var(--text);" onclick="limpiarFiltros()">🧹 Limpiar</button>
+                <select id="filtroUbicacionSelect" class="filter-select" onchange="cambiarFiltroUbicacion()"><option value="">📍 Todas las ubicaciones</option></select>
+                <input type="text" id="filtroResponsableInput" class="filter-input" placeholder="👤 Responsable..." list="filtroResponsableList" oninput="cambiarFiltroResponsable()" autocomplete="off">
+                <button class="btn btn-sm" style="background:var(--card); border:1.5px solid var(--border); border-radius:20px; font-size:0.65rem; padding:0.25rem 0.5rem; color:var(--text);" onclick="limpiarFiltros()">🧹 Limpiar</button>
                 <datalist id="filtroResponsableList"></datalist>
             </div>
         </div>
 
-        <!-- Historial -->
         <div class="history-section">
             <h3>📋 Historial</h3>
             <div style="display:flex; gap:0.4rem; margin:0.4rem 0;">
@@ -346,7 +254,6 @@
         </div>
     </main>
 
-    <!-- Barra inferior (siempre visible) -->
     <nav class="bottom-nav" id="bottomNav">
         <div class="nav-item active" onclick="mostrarSeccion('dashboard')"><i>📊</i><span>Inicio</span></div>
         <div class="nav-item" onclick="prepararBusqueda()"><i>🔍</i><span>Buscar</span></div>
@@ -357,7 +264,6 @@
 
     <input type="file" id="fileInputXlsx" class="hidden-input" accept=".xlsx,.xls" onchange="importarArchivo(event)">
     <input type="file" id="loadProgressInputXlsx" class="hidden-input" accept=".xlsx,.xls" onchange="cargarProgresoXLSX(event)">
-    
     <div id="toastContainer"></div>
 
     <script>
@@ -368,7 +274,6 @@
             'P3': ['DEP. 4 - P3','AULA P- P3','AULA 4 - P3','AULA 5 - P3','SALA DE ESTUDIO 5 - P3','SALA DE ESTUDIO 6 - P3','SALA DE ESTUDIO 7 - P3','SALA DE ESTUDIO 8 - P3','SALA DE ESTUDIO 9 - P3','SALA DE ESTUDIO 10 - P3','SALA DE ESTUDIO 11 - P3','PASILLO - P3','AULA MAGNA - P3','BAÑO DE HOMBRES - P3','BAÑO DE MUJERES - P3'],
             'Terraza': ['TERRAZA']
         };
-
         const LISTA_RESPONSABLES = [
             'Liz Aliaga','Sol Alipaz','Tatiana Aenitez','Boris Aranisa','Luisa Canaviri','Manuel Chavez',
             'Fernando Fernandez','Yolanda Flores','Marianne Gassenmeier','Armando Gonzales','Maks Gutierrez',
@@ -380,27 +285,21 @@
             'Martin Salinas','Leonardo Taborga','Leonel Quispe','Milton Rios'
         ];
 
-        let activosDB = [];
-        let activosMap = {};
-        let historialInventario = [];
-        let activoActual = null;
-        let resultadosBusqueda = [];
-        let indiceNavegacion = -1;
-        let filtroEstado = 'inventariados';
-        let filtroPiso = null;
-        let filtroUbicacion = null;
-        let filtroResponsable = '';
-        let html5QrScanner = null;
-        let escaneando = false;
-        let intervaloExportacion = null;
+        let activosDB = [], activosMap = {}, historialInventario = [], activoActual = null;
+        let resultadosBusqueda = [], indiceNavegacion = -1;
+        let filtroEstado = 'inventariados', filtroPiso = null, filtroUbicacion = null, filtroResponsable = '';
+        let html5QrScanner = null, escaneando = false, intervaloExportacion = null;
+        let modoOscuro = false;
 
         // ===================== INICIALIZACIÓN =====================
         function init() {
+            if (localStorage.getItem('modoOscuro') === 'true') { modoOscuro = true; document.body.classList.add('modo-oscuro'); }
             cargarEstadoGuardado();
             actualizarDashboard();
             actualizarTablaHistorial();
             actualizarSelectUbicaciones();
             poblarDatalistResponsables();
+            poblarDatalistsFormulario();
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
                     navigator.serviceWorker.register('data:application/javascript;base64,' + btoa(
@@ -411,18 +310,11 @@
             window.addEventListener('pagehide', () => guardarEnLocalStorage());
             window.addEventListener('pageshow', () => { cargarEstadoGuardado(); actualizarDashboard(); actualizarTablaHistorial(); });
             let deferredPrompt;
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                document.getElementById('installBanner').style.display = 'block';
-            });
+            window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('installBanner').style.display = 'block'; });
             window.instalarApp = () => { if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt = null; document.getElementById('installBanner').style.display = 'none'; }); } };
             window.addEventListener('appinstalled', () => { document.getElementById('installBanner').style.display = 'none'; });
-
             if (intervaloExportacion) clearInterval(intervaloExportacion);
-            intervaloExportacion = setInterval(() => {
-                if (confirm('¿Desea exportar el progreso ahora?')) guardarProgresoXLSX();
-            }, 20 * 60 * 1000);
+            intervaloExportacion = setInterval(() => { if (confirm('¿Desea exportar el progreso ahora?')) guardarProgresoXLSX(); }, 20 * 60 * 1000);
         }
 
         function cargarEstadoGuardado() {
@@ -431,30 +323,22 @@
             if (datos) try { activosDB = JSON.parse(datos); reconstruirMapa(); } catch(e){}
             if (hist) try { historialInventario = JSON.parse(hist); } catch(e){}
         }
+        function guardarEnLocalStorage() { localStorage.setItem('inventario2026_activos', JSON.stringify(activosDB)); localStorage.setItem('inventario2026_historial', JSON.stringify(historialInventario)); }
+        function reconstruirMapa() { activosMap = {}; activosDB.forEach(a => { const cod = (a.CODIGOAF||'').trim(); if(cod) activosMap[cod] = a; }); }
+        function obtenerUbicacionOriginal(a) { return a['NOM UBICACION'] || a['NOMUBICACION'] || a['NOM_UBICACION'] || a['NOM UBICACIÓN'] || ''; }
+        function obtenerResponsableOriginal(a) { return a['NOM RESP ANT'] || a['NOMRESPANT'] || a['NOM_RESP_ANT'] || ''; }
+        function obtenerEstadoOriginal(a) { return a['OBSERV ESTADO'] || a['OBSERVESTADO'] || a['ESTADOAF'] || a['OBSERV_ESTADO'] || ''; }
 
-        function guardarEnLocalStorage() {
-            localStorage.setItem('inventario2026_activos', JSON.stringify(activosDB));
-            localStorage.setItem('inventario2026_historial', JSON.stringify(historialInventario));
-        }
-
-        function reconstruirMapa() {
-            activosMap = {};
-            activosDB.forEach(a => { const cod = (a.CODIGOAF||'').trim(); if(cod) activosMap[cod] = a; });
-        }
-
-        function obtenerUbicacionOriginal(activo) {
-            return activo['NOM UBICACION'] || activo['NOMUBICACION'] || activo['NOM_UBICACION'] || activo['NOM UBICACIÓN'] || '';
-        }
-        function obtenerResponsableOriginal(activo) {
-            return activo['NOM RESP ANT'] || activo['NOMRESPANT'] || activo['NOM_RESP_ANT'] || '';
-        }
-        function obtenerEstadoOriginal(activo) {
-            return activo['OBSERV ESTADO'] || activo['OBSERVESTADO'] || activo['ESTADOAF'] || activo['OBSERV_ESTADO'] || '';
+        // ===================== MODO OSCURO =====================
+        function toggleModoOscuro() {
+            modoOscuro = !modoOscuro;
+            if (modoOscuro) { document.body.classList.add('modo-oscuro'); localStorage.setItem('modoOscuro', 'true'); }
+            else { document.body.classList.remove('modo-oscuro'); localStorage.setItem('modoOscuro', 'false'); }
+            document.getElementById('menuModoOscuro').textContent = modoOscuro ? '☀️ Modo claro' : '🌙 Modo oscuro';
         }
 
         // ===================== IMPORTAR =====================
         function normalizarClave(key) { return key.trim().toUpperCase().replace(/\s+/g, ''); }
-
         function importarArchivo(event) {
             const file = event.target.files[0];
             if(!file) return;
@@ -478,7 +362,6 @@
                     if (!newRow['NOMRESPANT'] && newRow['NOM RESP ANT']) newRow['NOMRESPANT'] = newRow['NOM RESP ANT'];
                     if (!newRow['OBSERVESTADO'] && newRow['OBSERV ESTADO']) newRow['OBSERVESTADO'] = newRow['OBSERV ESTADO'];
                     if (!newRow['ESTADOAF'] && newRow['ESTADO AF']) newRow['ESTADOAF'] = newRow['ESTADO AF'];
-                    
                     newRow._estadoInventario = newRow._estadoInventario || 'pendiente';
                     newRow._nuevaUbicacion = newRow._nuevaUbicacion || '';
                     newRow._nuevoResponsable = newRow._nuevoResponsable || '';
@@ -486,10 +369,7 @@
                     newRow._observaciones = newRow._observaciones || '';
                     return newRow;
                 });
-                reconstruirMapa();
-                guardarEnLocalStorage();
-                actualizarDashboard();
-                actualizarTablaHistorial();
+                reconstruirMapa(); guardarEnLocalStorage(); actualizarDashboard(); actualizarTablaHistorial();
                 mostrarToast(`✅ ${activosDB.length} activos importados`);
             };
             reader.readAsArrayBuffer(file);
@@ -497,7 +377,6 @@
 
         // ===================== ESCÁNER =====================
         function obtenerDimensionesQrBox() { return { width: window.innerWidth, height: window.innerHeight }; }
-
         function toggleScanner() {
             if (escaneando) { detenerScanner(); return; }
             document.getElementById('cameraOverlay').classList.add('active');
@@ -505,27 +384,14 @@
             escaneando = true;
             html5QrScanner = new Html5Qrcode("reader");
             const config = {
-                fps: 15,
-                qrbox: obtenerDimensionesQrBox,
-                formatsToSupport: [
-                    Html5QrcodeSupportedFormats.QR_CODE,
-                    Html5QrcodeSupportedFormats.CODE_128,
-                    Html5QrcodeSupportedFormats.CODE_39,
-                    Html5QrcodeSupportedFormats.EAN_13,
-                    Html5QrcodeSupportedFormats.EAN_8,
-                    Html5QrcodeSupportedFormats.UPC_A,
-                    Html5QrcodeSupportedFormats.UPC_E,
-                    Html5QrcodeSupportedFormats.CODABAR
-                ],
+                fps: 15, qrbox: obtenerDimensionesQrBox,
+                formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE, Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39, Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8, Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E, Html5QrcodeSupportedFormats.CODABAR],
             };
-            html5QrScanner.start(
-                { facingMode: "environment" },
-                config,
+            html5QrScanner.start({ facingMode: "environment" }, config,
                 (decoded) => { document.getElementById('searchInput').value = decoded; buscarActivo(); detenerScanner(); },
                 (err) => {}
             ).catch(() => { detenerScanner(); mostrarToast('Error de cámara', 'error'); });
         }
-
         function detenerScanner() {
             if (html5QrScanner) { html5QrScanner.stop().then(() => html5QrScanner.clear()).catch(()=>{}); html5QrScanner = null; }
             document.getElementById('cameraOverlay').classList.remove('active');
@@ -540,38 +406,33 @@
             document.getElementById('newNuevoPiso').value = '';
             actualizarSubUbicaciones_New();
             document.getElementById('newNuevoResponsable').value = '';
-            document.getElementById('newOtroResponsable').style.display = 'none';
             document.getElementById('newNuevoEstado').value = '';
             document.getElementById('newObservaciones').value = '';
         }
         function closeNewAssetForm() { document.getElementById('newAssetOverlay').classList.remove('active'); }
         function actualizarSubUbicaciones_New() {
             const piso = document.getElementById('newNuevoPiso').value;
-            const sub = document.getElementById('newNuevaSubUbicacion');
-            sub.innerHTML = '<option value="">Seleccionar...</option>';
+            const datalist = document.getElementById('newUbicacionesList');
+            datalist.innerHTML = '';
             if (piso && UBICACIONES_POR_PISO[piso]) {
-                sub.disabled = false;
-                UBICACIONES_POR_PISO[piso].forEach(u => { const opt = document.createElement('option'); opt.value = u; opt.textContent = u; sub.appendChild(opt); });
-            } else { sub.disabled = true; }
+                UBICACIONES_POR_PISO[piso].forEach(u => { const opt = document.createElement('option'); opt.value = u; datalist.appendChild(opt); });
+            }
         }
         function guardarNuevoActivo() {
             const piso = document.getElementById('newNuevoPiso').value;
-            const sub = document.getElementById('newNuevaSubUbicacion').value;
+            const sub = document.getElementById('newNuevaSubUbicacion').value.trim();
             if (!piso || !sub) { mostrarToast('Seleccione piso y ubicación', 'error'); return; }
             const codigo = document.getElementById('newCodigo').value.trim() || ('NUEVO-' + Date.now());
-            const respSelect = document.getElementById('newNuevoResponsable').value;
-            const respOtro = document.getElementById('newOtroResponsable').value.trim();
-            const resp = (respSelect === '__otro__') ? respOtro : respSelect;
-            const estado = document.getElementById('newNuevoEstado').value;
+            const resp = document.getElementById('newNuevoResponsable').value.trim();
+            const estado = document.getElementById('newNuevoEstado').value.trim();
             const obs = document.getElementById('newObservaciones').value.trim();
             const nuevoActivo = {
                 CODIGOAF: codigo, NOMBREAF: '', DESCAF: '', 'NOM UBICACION': '', 'NOM RESP ANT': '', ESTADOAF: '', 'OBSERV ESTADO': estado,
-                _estadoInventario: 'nuevo', _nuevaUbicacion: sub, _nuevoResponsable: resp, _nuevoEstado: estado, _observaciones: obs, _codigoAuto: codigo
+                _estadoInventario: 'nuevo', _nuevaUbicacion: sub, _nuevoResponsable: resp, _nuevoEstado: estado, _observaciones: obs
             };
             activosDB.push(nuevoActivo);
             reconstruirMapa(); guardarEnLocalStorage(); actualizarDashboard(); actualizarTablaHistorial();
-            mostrarToast('✅ Nuevo activo agregado');
-            closeNewAssetForm();
+            mostrarToast('✅ Nuevo activo agregado'); closeNewAssetForm();
         }
 
         // ===================== BÚSQUEDA Y NAVEGACIÓN =====================
@@ -587,8 +448,7 @@
             document.getElementById('clearSearchBtn').style.display = 'inline-flex';
         }
         function limpiarBusqueda() {
-            const input = document.getElementById('searchInput');
-            input.value = '';
+            document.getElementById('searchInput').value = '';
             document.getElementById('assetDetail').classList.remove('active');
             activoActual = null; resultadosBusqueda = []; indiceNavegacion = -1;
             document.getElementById('clearSearchBtn').style.display = 'none';
@@ -596,9 +456,7 @@
         function prepararBusqueda() {
             limpiarBusqueda();
             const input = document.getElementById('searchInput');
-            input.value = 'E';
-            input.focus();
-            input.setSelectionRange(1, 1);
+            input.value = 'E'; input.focus(); input.setSelectionRange(1, 1);
             input.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
         function buscarPrimerPendiente() {
@@ -629,17 +487,7 @@
             else if (est === 'nuevo') { badge.classList.add('badge-nuevo'); badge.textContent = '🆕 NUEVO'; }
             else { badge.classList.add('badge-pendiente'); badge.textContent = '⏳ PENDIENTE'; }
             document.getElementById('navInfo').textContent = resultadosBusqueda.length > 1 ? `${indiceNavegacion+1}/${resultadosBusqueda.length}` : '';
-            const respSelect = document.getElementById('nuevoResponsable');
-            const respOtro = document.getElementById('otroResponsable');
-            const respGuardado = activo._nuevoResponsable || '';
-            const listaResponsables = Array.from(respSelect.options).map(o => o.value);
-            if (listaResponsables.includes(respGuardado)) {
-                respSelect.value = respGuardado; respOtro.style.display = 'none';
-            } else if (respGuardado) {
-                respSelect.value = '__otro__'; respOtro.style.display = 'block'; respOtro.value = respGuardado;
-            } else {
-                respSelect.value = ''; respOtro.style.display = 'none';
-            }
+            document.getElementById('nuevoResponsable').value = activo._nuevoResponsable || '';
             document.getElementById('nuevoEstado').value = activo._nuevoEstado || '';
             document.getElementById('observaciones').value = activo._observaciones || '';
             const nuevaUb = activo._nuevaUbicacion || '';
@@ -653,36 +501,30 @@
         }
         function actualizarSubUbicaciones() {
             const piso = document.getElementById('nuevoPiso').value;
-            const sub = document.getElementById('nuevaSubUbicacion');
-            sub.innerHTML = '<option value="">Seleccionar...</option>';
+            const datalist = document.getElementById('subUbicacionesList');
+            datalist.innerHTML = '';
             if (piso && UBICACIONES_POR_PISO[piso]) {
-                sub.disabled = false;
-                UBICACIONES_POR_PISO[piso].forEach(u => { const opt = document.createElement('option'); opt.value = u; opt.textContent = u; sub.appendChild(opt); });
-            } else { sub.disabled = true; }
+                UBICACIONES_POR_PISO[piso].forEach(u => { const opt = document.createElement('option'); opt.value = u; datalist.appendChild(opt); });
+            }
         }
 
-        function obtenerResponsableFinal(idSelect, idOtro) {
-            const select = document.getElementById(idSelect);
-            const otro = document.getElementById(idOtro);
-            if (select.value === '__otro__') return otro.value.trim();
-            return select.value;
-        }
-
+        // ===================== GUARDAR / MARCAR (CAMPOS NO OBLIGATORIOS) =====================
         function guardarCambios() {
             if (!activoActual) return;
             const piso = document.getElementById('nuevoPiso').value;
-            const sub = document.getElementById('nuevaSubUbicacion').value;
-            if (!piso || !sub) { mostrarToast('Seleccione piso y ubicación', 'error'); return; }
-            const nuevaUb = sub;
-            const resp = obtenerResponsableFinal('nuevoResponsable', 'otroResponsable');
-            const estadoSeleccionado = document.getElementById('nuevoEstado').value;
+            const sub = document.getElementById('nuevaSubUbicacion').value.trim();
+            const resp = document.getElementById('nuevoResponsable').value.trim();
+            const estadoSeleccionado = document.getElementById('nuevoEstado').value.trim();
             const obs = document.getElementById('observaciones').value.trim();
             const ubicacionOriginal = obtenerUbicacionOriginal(activoActual);
+            const responsableOriginal = obtenerResponsableOriginal(activoActual);
             const estadoOriginal = obtenerEstadoOriginal(activoActual);
-            const tipo = (nuevaUb !== ubicacionOriginal || resp !== (obtenerResponsableOriginal(activoActual)) || estadoSeleccionado !== '') ? 'con_cambio' : 'sin_cambio';
-            const estadoFinal = estadoSeleccionado || estadoOriginal;
-            Object.assign(activoActual, {_estadoInventario: tipo, _nuevaUbicacion: nuevaUb, _nuevoResponsable: resp, _nuevoEstado: estadoFinal, _observaciones: obs});
-            const reg = {codigo: activoActual.CODIGOAF, nombre: activoActual.NOMBREAF, ubicacionOriginal, nuevaUbicacion: nuevaUb, responsableOriginal: obtenerResponsableOriginal(activoActual), nuevoResponsable: resp, estado: estadoFinal, tipo, observaciones: obs};
+            const nuevaUb = sub || ubicacionOriginal;
+            const nuevoResp = resp || responsableOriginal;
+            const nuevoEstado = estadoSeleccionado || estadoOriginal;
+            const tipo = (nuevaUb !== ubicacionOriginal || nuevoResp !== responsableOriginal || nuevoEstado !== estadoOriginal || obs !== '') ? 'con_cambio' : 'sin_cambio';
+            Object.assign(activoActual, {_estadoInventario: tipo, _nuevaUbicacion: nuevaUb, _nuevoResponsable: nuevoResp, _nuevoEstado: nuevoEstado, _observaciones: obs});
+            const reg = {codigo: activoActual.CODIGOAF, nombre: activoActual.NOMBREAF, ubicacionOriginal, nuevaUbicacion: nuevaUb, responsableOriginal, nuevoResponsable: nuevoResp, estado: nuevoEstado, tipo, observaciones: obs};
             const idx = historialInventario.findIndex(h => h.codigo === reg.codigo);
             if (idx>=0) historialInventario[idx] = reg; else historialInventario.push(reg);
             guardarEnLocalStorage(); actualizarDashboard(); actualizarTablaHistorial();
@@ -692,10 +534,10 @@
         function marcarSinCambios() {
             if (!activoActual) return;
             const ubicacionOriginal = obtenerUbicacionOriginal(activoActual);
+            const responsableOriginal = obtenerResponsableOriginal(activoActual);
             const estadoOriginal = obtenerEstadoOriginal(activoActual);
-            const respOriginal = obtenerResponsableOriginal(activoActual);
-            Object.assign(activoActual, {_estadoInventario:'sin_cambio', _nuevaUbicacion: ubicacionOriginal, _nuevoResponsable: respOriginal, _nuevoEstado: estadoOriginal, _observaciones:''});
-            const reg = {codigo: activoActual.CODIGOAF, nombre: activoActual.NOMBREAF, ubicacionOriginal, nuevaUbicacion: ubicacionOriginal, responsableOriginal: respOriginal, nuevoResponsable: respOriginal, estado: estadoOriginal, tipo:'sin_cambio', observaciones:''};
+            Object.assign(activoActual, {_estadoInventario:'sin_cambio', _nuevaUbicacion: ubicacionOriginal, _nuevoResponsable: responsableOriginal, _nuevoEstado: estadoOriginal, _observaciones:''});
+            const reg = {codigo: activoActual.CODIGOAF, nombre: activoActual.NOMBREAF, ubicacionOriginal, nuevaUbicacion: ubicacionOriginal, responsableOriginal, nuevoResponsable: responsableOriginal, estado: estadoOriginal, tipo:'sin_cambio', observaciones:''};
             const idx = historialInventario.findIndex(h => h.codigo === reg.codigo);
             if (idx>=0) historialInventario[idx] = reg; else historialInventario.push(reg);
             guardarEnLocalStorage(); actualizarDashboard(); actualizarTablaHistorial();
@@ -703,12 +545,9 @@
             setTimeout(() => buscarPrimerPendiente(), 800);
         }
         function limpiarFormulario() {
-            document.getElementById('nuevoPiso').value='';
-            actualizarSubUbicaciones();
-            document.getElementById('nuevoResponsable').value='';
-            document.getElementById('otroResponsable').style.display='none';
-            document.getElementById('nuevoEstado').value='';
-            document.getElementById('observaciones').value='';
+            document.getElementById('nuevoPiso').value=''; actualizarSubUbicaciones();
+            document.getElementById('nuevaSubUbicacion').value=''; document.getElementById('nuevoResponsable').value='';
+            document.getElementById('nuevoEstado').value=''; document.getElementById('observaciones').value='';
         }
 
         function actualizarDashboard() {
@@ -731,73 +570,44 @@
 
         // ===================== FILTROS =====================
         function toggleStateFilter(tipo, el) {
-            if (filtroEstado === tipo) {
-                if (tipo === 'inventariados') return;
-                filtroEstado = 'inventariados';
-                document.querySelectorAll('.filter-chip[data-filter="inventariados"], .filter-chip[data-filter="todos"], .filter-chip[data-filter="pendiente"], .filter-chip[data-filter="sin_cambio"], .filter-chip[data-filter="con_cambio"], .filter-chip[data-filter="nuevo"]')
-                    .forEach(c => c.classList.remove('active'));
-                document.querySelector('.filter-chip[data-filter="inventariados"]').classList.add('active');
-            } else {
-                document.querySelectorAll('.filter-chip[data-filter="inventariados"], .filter-chip[data-filter="todos"], .filter-chip[data-filter="pendiente"], .filter-chip[data-filter="sin_cambio"], .filter-chip[data-filter="con_cambio"], .filter-chip[data-filter="nuevo"]')
-                    .forEach(c => c.classList.remove('active'));
-                filtroEstado = tipo;
-                el.classList.add('active');
-            }
+            if (filtroEstado === tipo) { if (tipo === 'inventariados') return; filtroEstado = 'inventariados'; }
+            else { filtroEstado = tipo; }
+            document.querySelectorAll('.filter-chip[data-filter]').forEach(c => c.classList.remove('active'));
+            document.querySelector(`.filter-chip[data-filter="${filtroEstado}"]`).classList.add('active');
             actualizarTablaHistorial();
         }
-
-        function cambiarFiltroPiso() {
-            const sel = document.getElementById('filtroPisoSelect');
-            filtroPiso = sel.value || null;
-            actualizarSelectUbicaciones();
-            document.getElementById('filtroUbicacionSelect').value = '';
-            filtroUbicacion = null;
-            actualizarTablaHistorial();
-        }
-
-        function cambiarFiltroUbicacion() {
-            const sel = document.getElementById('filtroUbicacionSelect');
-            filtroUbicacion = sel.value || null;
-            actualizarTablaHistorial();
-        }
-
-        function cambiarFiltroResponsable() {
-            const input = document.getElementById('filtroResponsableInput');
-            filtroResponsable = input.value.trim().toLowerCase();
-            actualizarTablaHistorial();
-        }
-
+        function cambiarFiltroPiso() { filtroPiso = document.getElementById('filtroPisoSelect').value || null; actualizarSelectUbicaciones(); document.getElementById('filtroUbicacionSelect').value = ''; filtroUbicacion = null; actualizarTablaHistorial(); }
+        function cambiarFiltroUbicacion() { filtroUbicacion = document.getElementById('filtroUbicacionSelect').value || null; actualizarTablaHistorial(); }
+        function cambiarFiltroResponsable() { filtroResponsable = document.getElementById('filtroResponsableInput').value.trim().toLowerCase(); actualizarTablaHistorial(); }
         function limpiarFiltros() {
             filtroEstado = 'inventariados';
-            document.querySelectorAll('.filter-chip[data-filter="inventariados"], .filter-chip[data-filter="todos"], .filter-chip[data-filter="pendiente"], .filter-chip[data-filter="sin_cambio"], .filter-chip[data-filter="con_cambio"], .filter-chip[data-filter="nuevo"]')
-                .forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.filter-chip[data-filter]').forEach(c => c.classList.remove('active'));
             document.querySelector('.filter-chip[data-filter="inventariados"]').classList.add('active');
-            document.getElementById('filtroPisoSelect').value = '';
-            filtroPiso = null;
+            document.getElementById('filtroPisoSelect').value = ''; filtroPiso = null;
             actualizarSelectUbicaciones();
-            document.getElementById('filtroUbicacionSelect').value = '';
-            filtroUbicacion = null;
-            document.getElementById('filtroResponsableInput').value = '';
-            filtroResponsable = '';
+            document.getElementById('filtroUbicacionSelect').value = ''; filtroUbicacion = null;
+            document.getElementById('filtroResponsableInput').value = ''; filtroResponsable = '';
             actualizarTablaHistorial();
         }
-
         function poblarDatalistResponsables() {
             const datalist = document.getElementById('filtroResponsableList');
             datalist.innerHTML = '';
-            LISTA_RESPONSABLES.forEach(nombre => { const opt = document.createElement('option'); opt.value = nombre; datalist.appendChild(opt); });
+            LISTA_RESPONSABLES.forEach(n => { const o = document.createElement('option'); o.value = n; datalist.appendChild(o); });
         }
-
+        function poblarDatalistsFormulario() {
+            const dl1 = document.getElementById('responsablesList');
+            const dl2 = document.getElementById('newResponsablesList');
+            dl1.innerHTML = ''; dl2.innerHTML = '';
+            LISTA_RESPONSABLES.forEach(n => { const o = document.createElement('option'); o.value = n; dl1.appendChild(o); dl2.appendChild(o.cloneNode(true)); });
+        }
         function actualizarSelectUbicaciones() {
-            const selUbicacion = document.getElementById('filtroUbicacionSelect');
-            selUbicacion.innerHTML = '<option value="">📍 Todas las ubicaciones</option>';
-            const pisoSeleccionado = document.getElementById('filtroPisoSelect').value;
-            if (pisoSeleccionado && UBICACIONES_POR_PISO[pisoSeleccionado]) {
-                UBICACIONES_POR_PISO[pisoSeleccionado].forEach(u => { const opt = document.createElement('option'); opt.value = u; opt.textContent = u; selUbicacion.appendChild(opt); });
+            const sel = document.getElementById('filtroUbicacionSelect');
+            sel.innerHTML = '<option value="">📍 Todas las ubicaciones</option>';
+            const piso = document.getElementById('filtroPisoSelect').value;
+            if (piso && UBICACIONES_POR_PISO[piso]) {
+                UBICACIONES_POR_PISO[piso].forEach(u => { const o = document.createElement('option'); o.value = u; o.textContent = u; sel.appendChild(o); });
             } else {
-                for (let piso in UBICACIONES_POR_PISO) {
-                    UBICACIONES_POR_PISO[piso].forEach(u => { const opt = document.createElement('option'); opt.value = u; opt.textContent = u; selUbicacion.appendChild(opt); });
-                }
+                for (let p in UBICACIONES_POR_PISO) { UBICACIONES_POR_PISO[p].forEach(u => { const o = document.createElement('option'); o.value = u; o.textContent = u; sel.appendChild(o); }); }
             }
         }
 
@@ -809,50 +619,32 @@
             activosDB.filter(a => a._estadoInventario === 'nuevo' && !datos.some(h => h.codigo === a.CODIGOAF))
                 .forEach(a => datos.push({ codigo: a.CODIGOAF, nombre: a.NOMBREAF || '(Nuevo)', ubicacionOriginal: '', nuevaUbicacion: a._nuevaUbicacion, nuevoResponsable: a._nuevoResponsable, estado: a._nuevoEstado || '', tipo: 'nuevo', observaciones: a._observaciones, responsableOriginal: '' }));
 
-            if (filtroEstado === 'inventariados') {
-                datos = datos.filter(h => h.tipo === 'sin_cambio' || h.tipo === 'con_cambio' || h.tipo === 'nuevo');
-            } else if (filtroEstado !== 'todos') {
-                datos = datos.filter(h => h.tipo === filtroEstado);
-            }
+            if (filtroEstado === 'inventariados') datos = datos.filter(h => h.tipo === 'sin_cambio' || h.tipo === 'con_cambio' || h.tipo === 'nuevo');
+            else if (filtroEstado !== 'todos') datos = datos.filter(h => h.tipo === filtroEstado);
             if (filtroPiso) {
                 datos = datos.filter(h => {
-                    if (h.tipo === 'pendiente') return UBICACIONES_POR_PISO[filtroPiso].some(u => h.ubicacionOriginal.includes(u));
-                    else if (h.tipo === 'nuevo') return UBICACIONES_POR_PISO[filtroPiso].includes(h.nuevaUbicacion);
-                    else return h.nuevaUbicacion && UBICACIONES_POR_PISO[filtroPiso].includes(h.nuevaUbicacion);
+                    if (h.tipo === 'pendiente') return UBICACIONES_POR_PISO[filtroPiso]?.some(u => (h.ubicacionOriginal||'').includes(u));
+                    else if (h.tipo === 'nuevo') return UBICACIONES_POR_PISO[filtroPiso]?.includes(h.nuevaUbicacion);
+                    else return UBICACIONES_POR_PISO[filtroPiso]?.includes(h.nuevaUbicacion);
                 });
             }
             if (filtroUbicacion) {
-                datos = datos.filter(h => {
-                    if (h.tipo === 'pendiente') return h.ubicacionOriginal === filtroUbicacion;
-                    else if (h.tipo === 'nuevo') return h.nuevaUbicacion === filtroUbicacion;
-                    else return h.nuevaUbicacion === filtroUbicacion || h.ubicacionOriginal === filtroUbicacion;
-                });
+                datos = datos.filter(h => h.nuevaUbicacion === filtroUbicacion || h.ubicacionOriginal === filtroUbicacion);
             }
             if (filtroResponsable) {
                 datos = datos.filter(h => {
-                    const respOrig = (h.responsableOriginal || '').toLowerCase();
-                    const respNuevo = (h.nuevoResponsable || '').toLowerCase();
-                    return respOrig.includes(filtroResponsable) || respNuevo.includes(filtroResponsable);
+                    const orig = (h.responsableOriginal || '').toLowerCase();
+                    const nuevo = (h.nuevoResponsable || '').toLowerCase();
+                    return orig.includes(filtroResponsable) || nuevo.includes(filtroResponsable);
                 });
             }
             if (!datos.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty-state">📭 Sin registros</td></tr>'; return; }
             tbody.innerHTML = datos.map(h => {
-                let responsableMostrar;
-                if (h.tipo === 'pendiente' || h.tipo === 'sin_cambio') {
-                    responsableMostrar = h.responsableOriginal || '';
-                } else {
-                    responsableMostrar = h.nuevoResponsable || h.responsableOriginal || '';
-                }
-                return `
-                <tr class="${h.tipo==='con_cambio'?'con-cambio': (h.tipo==='pendiente'?'pendiente': (h.tipo==='nuevo'?'nuevo':'inventariado'))}">
-                    <td><strong>${h.codigo}</strong></td><td>${h.nombre||''}</td><td>${h.ubicacionOriginal||''}</td>
-                    <td>${h.nuevaUbicacion||''}</td><td>${responsableMostrar}</td><td>${h.estado||''}</td>
+                let responsableMostrar = (h.tipo === 'pendiente' || h.tipo === 'sin_cambio') ? (h.responsableOriginal || '') : (h.nuevoResponsable || h.responsableOriginal || '');
+                return `<tr class="${h.tipo==='con_cambio'?'con-cambio': (h.tipo==='pendiente'?'pendiente': (h.tipo==='nuevo'?'nuevo':'inventariado'))}">
+                    <td><strong>${h.codigo}</strong></td><td>${h.nombre||''}</td><td>${h.ubicacionOriginal||''}</td><td>${h.nuevaUbicacion||''}</td><td>${responsableMostrar}</td><td>${h.estado||''}</td>
                     <td>${h.tipo==='con_cambio'?'🔄 Con cambios': (h.tipo==='pendiente'?'⏳ Pendiente': (h.tipo==='nuevo'?'🆕 Nuevo':'✅ Sin cambios'))}</td>
-                    <td>
-                        <button class="action-btn" onclick="eliminarRegistro('${h.codigo}')" title="Eliminar">🗑️</button>
-                        <button class="action-btn" onclick="editarRegistro('${h.codigo}')" title="Editar">✏️</button>
-                    </td>
-                </tr>`;
+                    <td><button class="action-btn" onclick="eliminarRegistro('${h.codigo}')" title="Eliminar">🗑️</button><button class="action-btn" onclick="editarRegistro('${h.codigo}')" title="Editar">✏️</button></td></tr>`;
             }).join('');
         }
 
@@ -860,33 +652,24 @@
             if (!confirm('¿Eliminar este registro?')) return;
             const activo = activosDB.find(a => a.CODIGOAF === codigo);
             if (activo) {
-                if (activo._estadoInventario === 'nuevo') {
-                    activosDB = activosDB.filter(a => a.CODIGOAF !== codigo);
-                } else {
-                    activo._estadoInventario = 'pendiente';
-                    activo._nuevaUbicacion = ''; activo._nuevoResponsable = ''; activo._nuevoEstado = ''; activo._observaciones = '';
-                }
+                if (activo._estadoInventario === 'nuevo') activosDB = activosDB.filter(a => a.CODIGOAF !== codigo);
+                else { activo._estadoInventario = 'pendiente'; activo._nuevaUbicacion = ''; activo._nuevoResponsable = ''; activo._nuevoEstado = ''; activo._observaciones = ''; }
                 reconstruirMapa();
             }
             historialInventario = historialInventario.filter(h => h.codigo !== codigo);
             guardarEnLocalStorage(); actualizarDashboard(); actualizarTablaHistorial();
             mostrarToast('Registro eliminado');
         }
-
         function editarRegistro(codigo) {
             const activo = activosDB.find(a => a.CODIGOAF === codigo);
             if (!activo) return;
-            resultadosBusqueda = [activo]; indiceNavegacion = 0;
-            mostrarActivo(activo);
+            resultadosBusqueda = [activo]; indiceNavegacion = 0; mostrarActivo(activo);
             document.getElementById('assetDetail').scrollIntoView({behavior:'smooth'});
         }
-
         function limpiarHistorial() {
             if (confirm('¿Limpiar TODO el historial? Los activos volverán a pendiente (excepto nuevos, que serán eliminados).')) {
                 activosDB = activosDB.filter(a => a._estadoInventario !== 'nuevo');
-                activosDB.forEach(a => {
-                    a._estadoInventario = 'pendiente'; a._nuevaUbicacion = ''; a._nuevoResponsable = ''; a._nuevoEstado = ''; a._observaciones = '';
-                });
+                activosDB.forEach(a => { a._estadoInventario = 'pendiente'; a._nuevaUbicacion = ''; a._nuevoResponsable = ''; a._nuevoEstado = ''; a._observaciones = ''; });
                 historialInventario = [];
                 reconstruirMapa(); guardarEnLocalStorage(); actualizarDashboard(); actualizarTablaHistorial();
                 mostrarToast('Historial y nuevos activos eliminados');
@@ -898,21 +681,17 @@
             const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
             const blob = new Blob([wbout], { type: 'application/octet-stream' });
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = nombreArchivo;
+            const a = document.createElement('a'); a.href = url; a.download = nombreArchivo;
             document.body.appendChild(a); a.click();
             setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
         }
-
         function guardarProgresoXLSX() {
             if (!activosDB.length) { mostrarToast('⚠️ Sin datos'); return; }
             const activosInventario = activosDB.filter(a => a._estadoInventario !== 'nuevo');
             const nuevosActivos = activosDB.filter(a => a._estadoInventario === 'nuevo');
             const hojaInventario = activosInventario.map(a => ({
                 CODIGOAF: a.CODIGOAF, NOMBREAF: a.NOMBREAF, DESCAF: a.DESCAF,
-                'UBICACION ORIGINAL': obtenerUbicacionOriginal(a),
-                'RESPONSABLE ORIGINAL': obtenerResponsableOriginal(a),
-                'ESTADO ORIGINAL': obtenerEstadoOriginal(a),
+                'UBICACION ORIGINAL': obtenerUbicacionOriginal(a), 'RESPONSABLE ORIGINAL': obtenerResponsableOriginal(a), 'ESTADO ORIGINAL': obtenerEstadoOriginal(a),
                 'NUEVA UBICACION': a._estadoInventario === 'pendiente' ? '' : a._nuevaUbicacion,
                 'NUEVO RESPONSABLE': a._estadoInventario === 'pendiente' ? '' : a._nuevoResponsable,
                 'NUEVO ESTADO': a._estadoInventario === 'pendiente' ? '' : (a._nuevoEstado || obtenerEstadoOriginal(a)),
@@ -922,8 +701,8 @@
             const hojaNuevos = nuevosActivos.map(a => ({
                 CODIGOAF: a.CODIGOAF, NOMBREAF: a.NOMBREAF || '', DESCAF: a.DESCAF || '',
                 'UBICACION ORIGINAL': '', 'RESPONSABLE ORIGINAL': '', 'ESTADO ORIGINAL': '',
-                'NUEVA UBICACION': a._nuevaUbicacion, 'NUEVO RESPONSABLE': a._nuevoResponsable,
-                'NUEVO ESTADO': a._nuevoEstado, OBSERVACIONES: a._observaciones, 'ESTADO INVENTARIO': 'nuevo'
+                'NUEVA UBICACION': a._nuevaUbicacion, 'NUEVO RESPONSABLE': a._nuevoResponsable, 'NUEVO ESTADO': a._nuevoEstado,
+                OBSERVACIONES: a._observaciones, 'ESTADO INVENTARIO': 'nuevo'
             }));
             const hojaHistorial = historialInventario.map(h => ({
                 CODIGOAF: h.codigo, NOMBREAF: h.nombre || '',
@@ -931,7 +710,6 @@
                 'RESPONSABLE ORIGINAL': h.responsableOriginal || '', 'NUEVO RESPONSABLE': h.nuevoResponsable || '',
                 ESTADO: h.estado || '', TIPO: h.tipo || '', OBSERVACIONES: h.observaciones || ''
             }));
-
             const wb = XLSX.utils.book_new();
             if (hojaInventario.length) { const ws = XLSX.utils.json_to_sheet(hojaInventario); XLSX.utils.book_append_sheet(wb, ws, 'Inventario'); }
             if (hojaNuevos.length) { const ws = XLSX.utils.json_to_sheet(hojaNuevos); XLSX.utils.book_append_sheet(wb, ws, 'Nuevos Activos'); }
@@ -939,9 +717,7 @@
             descargarXLSX(wb, 'Progreso_Inventario_2026.xlsx');
             mostrarToast('💾 Progreso guardado (3 hojas)');
         }
-
         function exportarExcel() { guardarProgresoXLSX(); }
-
         function cargarProgresoXLSX(event) {
             const file = event.target.files[0]; if (!file) return;
             const reader = new FileReader();
@@ -953,13 +729,7 @@
                     const jsonInv = XLSX.utils.sheet_to_json(sheetInv, {defval:''});
                     if (jsonInv.length) {
                         activosDB = jsonInv.map(a => {
-                            const newRow = { ...a,
-                                _estadoInventario: a['ESTADO INVENTARIO'] || 'pendiente',
-                                _nuevaUbicacion: a['NUEVA UBICACION'] || '',
-                                _nuevoResponsable: a['NUEVO RESPONSABLE'] || '',
-                                _nuevoEstado: a['NUEVO ESTADO'] || '',
-                                _observaciones: a.OBSERVACIONES || ''
-                            };
+                            const newRow = { ...a, _estadoInventario: a['ESTADO INVENTARIO'] || 'pendiente', _nuevaUbicacion: a['NUEVA UBICACION'] || '', _nuevoResponsable: a['NUEVO RESPONSABLE'] || '', _nuevoEstado: a['NUEVO ESTADO'] || '', _observaciones: a.OBSERVACIONES || '' };
                             if (a['UBICACION ORIGINAL']) newRow['NOM UBICACION'] = a['UBICACION ORIGINAL'];
                             if (a['RESPONSABLE ORIGINAL']) newRow['NOM RESP ANT'] = a['RESPONSABLE ORIGINAL'];
                             if (a['ESTADO ORIGINAL']) newRow['OBSERV ESTADO'] = a['ESTADO ORIGINAL'];
@@ -968,15 +738,7 @@
                         const hojaNuevos = wb.Sheets['Nuevos Activos'];
                         if (hojaNuevos) {
                             const jsonNuevos = XLSX.utils.sheet_to_json(hojaNuevos, {defval:''});
-                            jsonNuevos.forEach(a => {
-                                activosDB.push({
-                                    ...a, _estadoInventario: 'nuevo',
-                                    _nuevaUbicacion: a['NUEVA UBICACION'] || '',
-                                    _nuevoResponsable: a['NUEVO RESPONSABLE'] || '',
-                                    _nuevoEstado: a['NUEVO ESTADO'] || '',
-                                    _observaciones: a.OBSERVACIONES || ''
-                                });
-                            });
+                            jsonNuevos.forEach(a => { activosDB.push({ ...a, _estadoInventario: 'nuevo', _nuevaUbicacion: a['NUEVA UBICACION'] || '', _nuevoResponsable: a['NUEVO RESPONSABLE'] || '', _nuevoEstado: a['NUEVO ESTADO'] || '', _observaciones: a.OBSERVACIONES || '' }); });
                         }
                         reconstruirMapa();
                     }
@@ -985,15 +747,12 @@
                 if (hojaHist) {
                     const jsonHist = XLSX.utils.sheet_to_json(hojaHist, {defval:''});
                     historialInventario = jsonHist.map(h => ({
-                        codigo: h.CODIGOAF || h.codigo || '',
-                        nombre: h.NOMBREAF || h.nombre || '',
+                        codigo: h.CODIGOAF || h.codigo || '', nombre: h.NOMBREAF || h.nombre || '',
                         ubicacionOriginal: h['UBICACION ORIGINAL'] || h.ubicacionOriginal || '',
                         nuevaUbicacion: h['NUEVA UBICACION'] || h.nuevaUbicacion || '',
                         responsableOriginal: h['RESPONSABLE ORIGINAL'] || h.responsableOriginal || '',
                         nuevoResponsable: h['NUEVO RESPONSABLE'] || h.nuevoResponsable || '',
-                        estado: h.ESTADO || h.estado || '',
-                        tipo: h.TIPO || h.tipo || '',
-                        observaciones: h.OBSERVACIONES || h.observaciones || ''
+                        estado: h.ESTADO || h.estado || '', tipo: h.TIPO || h.tipo || '', observaciones: h.OBSERVACIONES || h.observaciones || ''
                     }));
                 }
                 guardarEnLocalStorage(); actualizarDashboard(); actualizarTablaHistorial();
@@ -1001,53 +760,23 @@
             };
             reader.readAsArrayBuffer(file);
         }
-
-        // ===================== EXTRAER HISTORIAL =====================
         function extraerHistorial() {
             const tbody = document.getElementById('historyTableBody');
             const filas = tbody.querySelectorAll('tr');
-            if (filas.length === 0 || filas[0].querySelector('.empty-state')) {
-                mostrarToast('No hay datos para extraer', 'error'); return;
-            }
+            if (filas.length === 0 || filas[0].querySelector('.empty-state')) { mostrarToast('No hay datos para extraer', 'error'); return; }
             const datos = [];
-            filas.forEach(fila => {
-                const celdas = fila.querySelectorAll('td');
-                if (celdas.length >= 7) {
-                    datos.push({
-                        'Código': celdas[0].textContent.trim(),
-                        'Nombre': celdas[1].textContent.trim(),
-                        'Ub. Original': celdas[2].textContent.trim(),
-                        'Nueva Ub.': celdas[3].textContent.trim(),
-                        'Responsable Original/Nuevo': celdas[4].textContent.trim(),
-                        'Estado': celdas[5].textContent.trim(),
-                        'Tipo': celdas[6].textContent.trim()
-                    });
-                }
-            });
+            filas.forEach(fila => { const celdas = fila.querySelectorAll('td'); if (celdas.length >= 7) datos.push({ 'Código': celdas[0].textContent.trim(), 'Nombre': celdas[1].textContent.trim(), 'Ub. Original': celdas[2].textContent.trim(), 'Nueva Ub.': celdas[3].textContent.trim(), 'Responsable Original/Nuevo': celdas[4].textContent.trim(), 'Estado': celdas[5].textContent.trim(), 'Tipo': celdas[6].textContent.trim() }); });
             if (datos.length === 0) return;
             const ws = XLSX.utils.json_to_sheet(datos);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Historial Extraído');
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Historial Extraído');
             descargarXLSX(wb, 'Historial_Extraido.xlsx');
             mostrarToast('📊 Historial extraído correctamente');
-        }
-
-        function toggleOtroCampo(idSelect, idOtro) {
-            const select = document.getElementById(idSelect);
-            const otro = document.getElementById(idOtro);
-            if (select.value === '__otro__') { otro.style.display = 'block'; } else { otro.style.display = 'none'; }
         }
 
         function toggleMenu() { document.getElementById('menuOverlay').classList.toggle('active'); }
         function closeMenu(e) { if (e.target === document.getElementById('menuOverlay')) document.getElementById('menuOverlay').classList.remove('active'); }
         function closeMenuDirect() { document.getElementById('menuOverlay').classList.remove('active'); }
-
-        function mostrarToast(msg, tipo='info') {
-            const cont = document.getElementById('toastContainer');
-            const t = document.createElement('div'); t.className = `toast ${tipo}`; t.textContent = msg;
-            cont.appendChild(t); setTimeout(() => t.remove(), 3000);
-        }
-
+        function mostrarToast(msg, tipo='info') { const cont = document.getElementById('toastContainer'); const t = document.createElement('div'); t.className = `toast ${tipo}`; t.textContent = msg; cont.appendChild(t); setTimeout(() => t.remove(), 3000); }
         function mostrarSeccion(sec) {
             document.querySelectorAll('.bottom-nav .nav-item').forEach(el => el.classList.remove('active'));
             const items = document.querySelectorAll('.bottom-nav .nav-item');
